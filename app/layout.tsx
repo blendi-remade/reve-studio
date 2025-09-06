@@ -17,8 +17,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Banana Peel - AI Image Remixing",
-  description: "AI image remixing, Reddit-style",
+  title: "Banana Peel - Where Images Evolve Through AI Comments",
+  description: "The social app where every comment transforms images with AI. Drop a prompt, watch nano banana work its magic, and see your ideas come to life through collaborative visual storytelling.",
+  keywords: ["AI image generation", "social media", "image editing", "nano banana", "collaborative art", "prompt-based AI"],
+  openGraph: {
+    title: "Banana Peel - Where Images Evolve Through AI Comments",
+    description: "The social app where every comment transforms images with AI. Join the visual conversation!",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Banana Peel - Where Images Evolve Through AI Comments", 
+    description: "Drop a prompt, watch AI transform images, join the visual conversation. Like Reddit, but every comment is magic! 🍌✨",
+  },
 };
 
 export default function RootLayout({

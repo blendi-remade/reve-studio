@@ -3,6 +3,7 @@
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { Zap } from 'lucide-react'
+import Image from 'next/image';
 
 export default function HomePage() {
   const { signInWithGoogle, loading } = useAuth()
@@ -24,19 +25,28 @@ export default function HomePage() {
         <div className="text-center space-y-8">
           {/* Logo */}
           <div className="flex justify-center">
-            <div className="bg-black text-white p-6 rotate-[2deg] hover:rotate-0 transition-transform inline-block">
-              <Zap className="w-20 h-20" />
+            <div className="p-8 rotate-[2deg] hover:rotate-0 transition-transform inline-block border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white">
+              <Image 
+                src="/logo.png"
+                alt="Banana Peel Logo"
+                width={200}
+                height={200}
+                className="object-contain"
+                priority
+              />
             </div>
           </div>
 
           {/* Title */}
           <div className="space-y-4">
-            <h1 className="text-5xl font-bold rotate-[-1deg]">
-              🍌 Banana Peel
-            </h1>
-            <p className="text-xl text-gray-600 font-mono rotate-[0.5deg]">
-              AI image remixing, Reddit-style
-            </p>
+            <div className="space-y-2">
+              <p className="text-2xl text-black font-bold rotate-[0.5deg]">
+                Where images evolve through prompts
+              </p>
+              <p className="text-xl text-gray-600 font-mono rotate-[0.5deg]">
+                Drop a comment, watch the magic happen ✨
+              </p>
+            </div>
           </div>
 
           {/* Sign in button */}
