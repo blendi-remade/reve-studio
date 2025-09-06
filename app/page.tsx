@@ -3,10 +3,20 @@
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { Zap } from 'lucide-react'
-import Image from 'next/image';
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function HomePage() {
-  const { signInWithGoogle, loading } = useAuth()
+  const { user, signInWithGoogle, loading } = useAuth()
+  const router = useRouter()
+
+  // Auto-redirect to feed if user is already signed in
+  useEffect(() => {
+    if (user && !loading) {
+      router.push('/feed')
+    }
+  }, [user, loading, router])
 
   if (loading) {
     return (
@@ -14,6 +24,18 @@ export default function HomePage() {
         <div className="text-center">
           <div className="w-12 h-12 bg-black rotate-45 mx-auto mb-4 animate-pulse"></div>
           <p className="font-mono">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is signed in but redirect hasn't happened yet, show loading
+  if (user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-black rotate-45 mx-auto mb-4 animate-pulse"></div>
+          <p className="font-mono">Redirecting to feed...</p>
         </div>
       </div>
     )
