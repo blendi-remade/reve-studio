@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, MessageSquare, Zap } from "lucide-react";
 import { KeyboardNav } from "@/components/keyboard-nav";
+import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 
 interface Comment {
   id: string;
@@ -25,7 +26,6 @@ interface PostPageProps {
 
 export default function PostPage({ params: paramsPromise }: PostPageProps) {
   const [params, setParams] = useState<{ id: string } | null>(null);
-  const [selectedCommentId, setSelectedCommentId] = useState<string>('comment-1');
   
   // Resolve params
   useEffect(() => {
@@ -63,32 +63,17 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     },
   ];
 
-  // Create navigation order (flattened tree for J/K navigation)
-  const navigationOrder = mockComments.map(c => c.id);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'j' || e.key === 'k') {
-        e.preventDefault();
-        const currentIndex = navigationOrder.indexOf(selectedCommentId);
-        
-        if (e.key === 'j' && currentIndex < navigationOrder.length - 1) {
-          setSelectedCommentId(navigationOrder[currentIndex + 1]);
-        } else if (e.key === 'k' && currentIndex > 0) {
-          setSelectedCommentId(navigationOrder[currentIndex - 1]);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedCommentId, navigationOrder]);
+  // Use the keyboard navigation hook
+  const { selectedItemId } = useKeyboardNavigation({
+    items: mockComments,
+    getItemId: (comment) => comment.id,
+    initialSelectedId: 'comment-1'
+  });
 
   if (!params) return <div>Loading...</div>;
 
   const CommentComponent = ({ comment }: { comment: Comment }) => {
-    const isSelected = selectedCommentId === comment.id;
+    const isSelected = selectedItemId === comment.id;
     const isChild = !comment.isRoot;
     
     return (

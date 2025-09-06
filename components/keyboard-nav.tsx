@@ -7,17 +7,37 @@ export function KeyboardNav() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['j', 'k', 'Tab', ' '].includes(e.key)) {
-        e.preventDefault(); // Prevent default behaviors
-        setPressedKeys(prev => new Set([...prev, e.key]));
+      // Listen for visual feedback only - don't prevent default here
+      const keyMap: Record<string, string> = {
+        'KeyJ': 'j',
+        'KeyK': 'k',
+        'Tab': 'Tab',
+        'Space': 'space'
+      };
+      
+      const mappedKey = keyMap[e.code];
+      if (mappedKey) {
+        // Only prevent default for Tab and Space to avoid browser behavior
+        if (e.code === 'Tab' || e.code === 'Space') {
+          e.preventDefault();
+        }
+        setPressedKeys(prev => new Set([...prev, mappedKey]));
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (['j', 'k', 'Tab', ' '].includes(e.key)) {
+      const keyMap: Record<string, string> = {
+        'KeyJ': 'j',
+        'KeyK': 'k',
+        'Tab': 'Tab',
+        'Space': 'space'
+      };
+      
+      const mappedKey = keyMap[e.code];
+      if (mappedKey) {
         setPressedKeys(prev => {
           const newSet = new Set(prev);
-          newSet.delete(e.key);
+          newSet.delete(mappedKey);
           return newSet;
         });
       }
@@ -69,7 +89,7 @@ export function KeyboardNav() {
       <div className="border-t border-black border-dashed pt-2">
         <div className="text-xs font-mono text-gray-600 mb-1 text-center">Compare</div>
         <div className="flex items-center justify-center">
-          <KeyButton keyName=" " label="SPACE" isWide={true} />
+          <KeyButton keyName="space" label="SPACE" isWide={true} />
         </div>
         <div className="text-xs text-gray-400 mt-1 text-center">Hold to view original</div>
       </div>
