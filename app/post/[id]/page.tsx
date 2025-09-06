@@ -13,6 +13,7 @@ import { AddCommentModal } from "@/components/modal/add-comment-modal";
 import { useAuth } from "@/contexts/auth-context";
 import { useLikeComment } from "@/hooks/useLikeComment";
 import { usePost } from "@/hooks/usePost";
+import { useRouter } from 'next/navigation';
 
 // Updated to match real API data structure
 interface CommentTree {
@@ -111,6 +112,8 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     });
     setShowAddModal(true);
   };
+
+  const router = useRouter();
 
   if (!params) return <div>Loading...</div>;
 
@@ -215,7 +218,12 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
         {/* Quirky header */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" className="rotate-[-2deg] hover:rotate-0 transition-transform">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rotate-[-2deg] hover:rotate-0 transition-transform"
+              onClick={() => router.push('/')}
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
