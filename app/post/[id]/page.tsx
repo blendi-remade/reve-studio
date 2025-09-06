@@ -123,10 +123,10 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="h-screen bg-white p-3 overflow-hidden">
+      <div className="max-w-6xl mx-auto h-full flex flex-col">
         {/* Quirky header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="sm" className="rotate-[-2deg] hover:rotate-0 transition-transform">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -148,14 +148,14 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
         </div>
         
         {/* Main content area */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 flex-1 min-h-0">
           {/* Image display area - left side */}
           <div className="space-y-4">
-            <Card className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rotate-[-0.5deg] hover:rotate-0 transition-transform">
-              <CardHeader className="pb-3">
+            <Card className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rotate-[-0.5deg] hover:rotate-0 transition-transform h-full">
+              <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-mono">Current Edit</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1">
                 <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-dashed border-black rounded-lg flex items-center justify-center relative overflow-hidden">
                   <div className="text-center p-8">
                     <Zap className="w-12 h-12 mx-auto mb-4 rotate-12" />
@@ -173,8 +173,8 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
           
           {/* Comments area - right side */}
           <div className="space-y-4">
-            <Card className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-[0.5deg] hover:rotate-0 transition-transform">
-              <CardHeader className="border-b-2 border-black border-dashed">
+            <Card className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-[0.5deg] hover:rotate-0 transition-transform h-full flex flex-col">
+              <CardHeader className="border-b-2 border-black border-dashed pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-mono flex items-center gap-2">
                     <MessageSquare className="w-5 h-5" />
@@ -185,13 +185,13 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-6">
+              <CardContent className="p-4 flex-1 overflow-y-auto">
+                <div className="space-y-4">
                   {mockComments.map(comment => (
                     <CommentComponent key={comment.id} comment={comment} />
                   ))}
                   
-                  <div className="text-center py-8">
+                  <div className="text-center py-4">
                     <p className="text-gray-500 font-mono text-sm rotate-[-1deg]">
                       More prompts loading...
                     </p>
