@@ -4,9 +4,10 @@ import { PostService } from '@/lib/services/post.service'
 
 export async function POST(
   request: Request,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
   try {
+    const { postId } = await params;
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     
@@ -15,7 +16,7 @@ export async function POST(
     }
 
     const postService = PostService.create()
-    const result = await postService.toggleLike(params.postId, user.id)
+    const result = await postService.toggleLike(postId, user.id)
     
     return NextResponse.json(result)
   } catch (error) {
