@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, MessageSquare, Zap } from "lucide-react";
+import { KeyboardNav } from "@/components/keyboard-nav";
 
 interface PostPageProps {
   params: Promise<{
@@ -140,6 +141,7 @@ export default async function PostPage({ params }: PostPageProps) {
           </div>
         </div>
       </div>
+      <KeyboardNav />
     </div>
   );
 }
