@@ -62,7 +62,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
       throw new Error('Failed to get upload URL')
     }
 
-    const { uploadUrl, filePath } = await uploadUrlResponse.json()
+    const { uploadUrl, publicUrl } = await uploadUrlResponse.json()
 
     // Upload file to GCS with progress tracking
     return new Promise((resolve, reject) => {
@@ -77,7 +77,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
 
       xhr.addEventListener('load', () => {
         if (xhr.status === 200) {
-          resolve(filePath)
+          resolve(publicUrl) // Return the public URL instead of file path
         } else {
           reject(new Error('Upload failed'))
         }
@@ -104,7 +104,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
 
     try {
       // Upload image to GCS
-      const imagePath = await uploadFile(file)
+      const imageUrl = await uploadFile(file)
 
       // Create post in database
       const response = await fetch('/api/posts', {
@@ -112,7 +112,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: title.trim(),
-          image_url: imagePath
+          image_url: imageUrl // This is now the full public URL
         })
       })
 

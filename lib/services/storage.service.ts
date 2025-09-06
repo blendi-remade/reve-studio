@@ -26,7 +26,7 @@ export class StorageService {
     fileName: string,
     contentType: string,
     directory: string = 'banana-peel'
-  ): Promise<{ uploadUrl: string; filePath: string }> {
+  ): Promise<{ uploadUrl: string; filePath: string; publicUrl: string }> {
     const fileExtension = fileName.split('.').pop()
     const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`
     const filePath = `${directory}/${uniqueFileName}`
@@ -44,9 +44,13 @@ export class StorageService {
       }
     })
 
+    // Get the public URL for the file
+    const publicUrl = this.getPublicUrl(filePath)
+
     return {
       uploadUrl: url,
-      filePath: filePath
+      filePath: filePath,
+      publicUrl: publicUrl
     }
   }
 
@@ -76,6 +80,16 @@ export class StorageService {
     const bucket = this.storage.bucket(this.bucketName)
     const file = bucket.file(path)
     return file.publicUrl()
+  }
+
+  // Convert stored path to public URL
+  pathToPublicUrl(path: string): string {
+    // If it's already a full URL, return as is
+    if (path.startsWith('http')) {
+      return path
+    }
+    // Otherwise convert path to public URL
+    return this.getPublicUrl(path)
   }
 
   // Delete a file
