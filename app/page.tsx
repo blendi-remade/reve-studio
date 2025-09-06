@@ -2,8 +2,11 @@
 
 import { useAuth } from '@/contexts/auth-context'
 import { SignInModal } from '@/components/modal/sign-in-modal'
+import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { useEffect, useState } from 'react'
+import { Zap } from 'lucide-react'
 
 export default function HomePage() {
   const { user, loading } = useAuth()
@@ -28,8 +31,40 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      {/* Your existing page content */}
+    <div className="min-h-screen bg-white">
+      {/* Header with Profile Dropdown */}
+      <header className="border-b-2 border-black border-dashed">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <h1 className="text-xl font-bold flex items-center gap-2">
+                <Zap className="w-5 h-5" />
+                Banana Peel
+              </h1>
+            </div>
+            <Badge variant="outline" className="rotate-[-1deg] border-2 border-black font-mono">
+              🍌 hackathon
+            </Badge>
+          </div>
+          
+          {/* Profile dropdown in top right */}
+          {user && <ProfileDropdown />}
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-20">
+            <h2 className="text-4xl font-bold mb-4 rotate-[-1deg]">
+              Welcome to Banana Peel!
+            </h2>
+            <p className="text-lg text-gray-600 font-mono rotate-[0.5deg]">
+              AI image remixing, Reddit-style 🎨
+            </p>
+          </div>
+        </div>
+      </main>
       
       {/* Show sign in modal if needed */}
       {showSignIn && !user && <SignInModal />}
