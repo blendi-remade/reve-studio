@@ -1,6 +1,7 @@
 import { DatabaseService } from './database.service'
 import { Comment, Profile } from '@/lib/types/domain.types'
 import { createServiceClient } from '@/lib/supabase/service-role'
+import { FalService } from './fal.service'
 
 interface CommentWithProfile extends Comment {
   profiles: Pick<Profile, 'id' | 'display_name' | 'avatar_url'>
@@ -42,7 +43,7 @@ export class CommentService extends DatabaseService {
   }
 
   /**
-   * Create a new comment (root or reply)
+   * Create a new comment (root or reply) - SIMPLE VERSION
    */
   async createComment({
     postId,
@@ -64,7 +65,8 @@ export class CommentService extends DatabaseService {
         user_id: userId,
         prompt,
         image_url: imageUrl,
-        parent_id: parentId
+        parent_id: parentId,
+        status: 'pending' // Start with pending status
       })
       .select(`
         *,
@@ -78,6 +80,126 @@ export class CommentService extends DatabaseService {
 
     if (error) throw error
     return data as CommentWithProfile
+  }
+
+  /**
+   * Get comment by fal request ID
+   */
+  async getCommentByFalRequestId(falRequestId: string): Promise<Comment | null> {
+    const { data, error } = await this.supabase
+      .from('comments')
+      .select('*')
+      .eq('fal_request_id', falRequestId)
+      .single()
+
+    if (error || !data) return null
+    return data
+  }
+
+  /**
+   * Update comment generation status
+   */
+  async updateCommentGeneration({
+    commentId,
+    status,
+    imageUrl,
+    error
+  }: {
+    commentId: string
+    status: 'generating' | 'completed' | 'failed'
+    imageUrl?: string
+    error?: string
+  }): Promise<void> {
+    const updateData: any = { status }
+    
+    if (imageUrl) updateData.image_url = imageUrl
+    if (error) updateData.error = error
+
+    const { error: updateError } = await this.supabase
+      .from('comments')
+      .update(updateData)
+      .eq('id', commentId)
+
+    if (updateError) throw updateError
+  }
+
+  /**
+   * Create a new comment with generation
+   */
+  async createCommentWithGeneration({
+    postId,
+    userId,
+    prompt,
+    parentId = null
+  }: {
+    postId: string
+    userId: string
+    prompt: string
+    parentId?: string | null
+  }): Promise<CommentWithProfile> {
+    // Create comment with empty image URL - frontend will handle status
+    const comment = await this.createComment({
+      postId,
+      userId,
+      prompt,
+      imageUrl: '', // Empty string, frontend checks status
+      parentId
+    })
+
+    try {
+      // Get the source image URL
+      let sourceImageUrl: string
+      
+      if (parentId) {
+        // Get parent comment's image
+        const { data: parentComment } = await this.supabase
+          .from('comments')
+          .select('image_url')
+          .eq('id', parentId)
+          .single()
+        
+        if (!parentComment) throw new Error('Parent comment not found')
+        sourceImageUrl = parentComment.image_url
+      } else {
+        // Get post's image
+        const { data: post } = await this.supabase
+          .from('posts')
+          .select('image_url')
+          .eq('id', postId)
+          .single()
+        
+        if (!post) throw new Error('Post not found')
+        sourceImageUrl = post.image_url
+      }
+
+      // Submit to fal.ai
+      const falService = FalService.create()
+      const { request_id } = await falService.submitImageEdit({
+        prompt,
+        imageUrls: [sourceImageUrl],
+        requestId: comment.id
+      })
+
+      // Update comment with fal request ID and status
+      await this.supabase
+        .from('comments')
+        .update({
+          fal_request_id: request_id,
+          status: 'generating'
+        })
+        .eq('id', comment.id)
+
+      return comment
+    } catch (error) {
+      // If generation submission fails, update status
+      await this.updateCommentGeneration({
+        commentId: comment.id,
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Failed to start generation'
+      })
+      
+      throw error
+    }
   }
 
   /**

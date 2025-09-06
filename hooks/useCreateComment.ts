@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from '@/contexts/auth-context'
 
 interface UseCreateCommentResult {
   createComment: (params: {
@@ -13,6 +14,7 @@ interface UseCreateCommentResult {
 export function useCreateComment(): UseCreateCommentResult {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { user } = useAuth()
 
   const createComment = async ({ 
     postId, 
@@ -27,15 +29,19 @@ export function useCreateComment(): UseCreateCommentResult {
       setCreating(true)
       setError(null)
 
-      const response = await fetch('/api/comments', {
+      if (!user) {
+        throw new Error('Please sign in to add comments')
+      }
+
+      // Call the correct endpoint with postId in the path
+      const response = await fetch(`/api/posts/${postId}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.id}` // Add auth header
         },
         body: JSON.stringify({
-          postId,
           prompt,
-          imageUrl: 'https://placeholder-image.jpg', // Temporary until Nano Banana
           parentId: parentId || null
         })
       })
@@ -44,11 +50,12 @@ export function useCreateComment(): UseCreateCommentResult {
         if (response.status === 401) {
           throw new Error('Please sign in to add comments')
         }
-        throw new Error(`Failed to create comment: ${response.status}`)
+        const errorData = await response.json()
+        throw new Error(errorData.error || `Failed to create comment: ${response.status}`)
       }
 
       const data = await response.json()
-      console.log('Comment created:', data.comment)
+      console.log('Comment created with generation:', data)
       
     } catch (err) {
       console.error('Error creating comment:', err)
