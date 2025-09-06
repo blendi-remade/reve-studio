@@ -7,7 +7,12 @@ export function KeyboardNav() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Listen for visual feedback only - don't prevent default here
+      // Skip hotkeys if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
       const keyMap: Record<string, string> = {
         'KeyJ': 'j',
         'KeyK': 'k',
@@ -26,6 +31,12 @@ export function KeyboardNav() {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      // Skip if user is typing
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
       const keyMap: Record<string, string> = {
         'KeyJ': 'j',
         'KeyK': 'k',
