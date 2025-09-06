@@ -381,8 +381,8 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
         {/* Main content area */}
         <div className="grid lg:grid-cols-2 gap-6 flex-1 min-h-0">
           {/* Image display area - left side */}
-          <div className="space-y-4">
-            <Card className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rotate-[-0.5deg] hover:rotate-0 transition-transform h-full">
+          <div className="flex flex-col min-h-0">
+            <Card className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rotate-[-0.5deg] hover:rotate-0 transition-transform flex-1 flex flex-col">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-mono">
                   {selectedComment ? `Edit: "${selectedComment.prompt}"` : 'Original Image'}
@@ -401,9 +401,9 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
           </div>
           
           {/* Comments area - right side */}
-          <div className="space-y-4">
-            <Card className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-[0.5deg] hover:rotate-0 transition-transform h-full flex flex-col">
-              <CardHeader className="border-b-2 border-black border-dashed pb-2">
+          <div className="flex flex-col min-h-0">
+            <Card className="border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-[0.5deg] hover:rotate-0 transition-transform flex-1 flex flex-col overflow-hidden">
+              <CardHeader className="border-b-2 border-black border-dashed pb-2 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-mono flex items-center gap-2">
                     <MessageSquare className="w-5 h-5" />
@@ -418,7 +418,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 flex-1 overflow-y-auto">
+              <CardContent className="p-4 flex-1 overflow-y-auto banana-scroll min-h-0">
                 {/* Loading State */}
                 {loading && (
                   <div className="text-center py-8">
