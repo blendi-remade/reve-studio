@@ -29,7 +29,7 @@ interface UseCommentsResult {
   flattenedComments: CommentTree[]
   loading: boolean
   error: string | null
-  refetch: () => Promise<void>
+  refetch: (silent?: boolean) => Promise<void>
   optimisticUpdateLikes: (commentId: string, increment: boolean) => void
 }
 
@@ -39,10 +39,13 @@ export function useComments(postId: string): UseCommentsResult {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchComments = async () => {
+  const fetchComments = async (silent = false) => {
     try {
-      setLoading(true)
-      setError(null)
+      // Only set loading if not a silent refresh
+      if (!silent) {
+        setLoading(true)
+        setError(null)
+      }
 
       const response = await fetch(`/api/posts/${postId}/comments`)
       
@@ -59,11 +62,17 @@ export function useComments(postId: string): UseCommentsResult {
       setFlattenedComments(data.flattened || [])
     } catch (err) {
       console.error('Error fetching comments:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load comments')
-      setComments([])
-      setFlattenedComments([])
+      // Only set error if not a silent refresh
+      if (!silent) {
+        setError(err instanceof Error ? err.message : 'Failed to load comments')
+        setComments([])
+        setFlattenedComments([])
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if not silent
+      if (!silent) {
+        setLoading(false)
+      }
     }
   }
 

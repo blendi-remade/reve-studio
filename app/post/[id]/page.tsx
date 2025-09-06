@@ -62,9 +62,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
 
   // Fetch the actual post data
   const { post, loading: postLoading, error: postError } = usePost(params?.id || '');
-  
   const { comments, flattenedComments, loading, error, refetch, optimisticUpdateLikes } = useComments(params?.id || '');
-  
   const { createComment } = useCreateComment();
   const { toggleLike } = useLikeComment();
 
@@ -86,7 +84,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     
     if (hasGeneratingComments) {
       const interval = setInterval(() => {
-        refetch();
+        refetch(true); // Pass true for silent refetch
       }, 3000); // Poll every 3 seconds
       
       return () => clearInterval(interval);
@@ -105,7 +103,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
       parentId: replyingTo?.id
     });
     
-    await refetch(); // Refresh comments
+    await refetch(); // Normal refetch (not silent) after creating a comment
     setReplyingTo(null); // Reset reply state
   };
 
@@ -359,10 +357,10 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               {post && !postLoading && (
                 <div className="flex items-center gap-2 border-2 border-black bg-gray-100 px-3 py-2 rotate-[-0.5deg] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                   <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">
-                    {(post.profiles.display_name || 'Anonymous').charAt(0).toUpperCase()}
+                    {(post.profile?.display_name || 'Anonymous').charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm font-semibold">
-                    by {post.profiles.display_name || 'Anonymous'}
+                    by {post.profile?.display_name || 'Anonymous'}
                   </span>
                 </div>
               )}
