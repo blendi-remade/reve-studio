@@ -107,7 +107,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               {comment.isRoot ? 'Root' : 'Child'}
             </Badge>
           </div>
-          <p className="text-xs mb-1 font-mono">"{comment.prompt}"</p>
+          <p className="text-xs mb-1 font-mono">&quot;{comment.prompt}&quot;</p>
           <div className="flex gap-2">
             <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
               <Heart className="w-3 h-3 mr-1" />
