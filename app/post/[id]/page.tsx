@@ -8,6 +8,9 @@ import { ArrowLeft, Heart, MessageSquare, Zap } from "lucide-react";
 import { KeyboardNav } from "@/components/keyboard-nav";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { useComments } from "@/hooks/useComments";
+import { useCreateComment } from "@/hooks/useCreateComment";
+import { AddCommentModal } from "@/components/modal/add-comment-modal";
+import { useAuth } from "@/contexts/auth-context";
 
 // Updated to match real API data structure
 interface CommentTree {
@@ -36,13 +39,24 @@ interface PostPageProps {
 export default function PostPage({ params: paramsPromise }: PostPageProps) {
   const [params, setParams] = useState<{ id: string } | null>(null);
   
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<{
+    id: string
+    prompt: string
+    author: string
+  } | null>(null);
+
+  const { user } = useAuth();
+  
   // Resolve params
   useEffect(() => {
     paramsPromise.then(setParams);
   }, [paramsPromise]);
 
   // Use real API data
-  const { comments, flattenedComments, loading, error } = useComments(params?.id || '');
+  const { comments, flattenedComments, loading, error, refetch } = useComments(params?.id || '');
+  
+  const { createComment } = useCreateComment();
 
   // Use keyboard navigation with real data
   const { selectedItemId } = useKeyboardNavigation({
@@ -50,6 +64,41 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     getItemId: (comment) => comment.id,
     initialSelectedId: flattenedComments[0]?.id || ''
   });
+
+  const handleCommentSubmit = async (prompt: string) => {
+    if (!params?.id) return;
+    
+    await createComment({
+      postId: params.id,
+      prompt,
+      parentId: replyingTo?.id
+    });
+    
+    await refetch(); // Refresh comments
+    setReplyingTo(null); // Reset reply state
+  };
+
+  const handleAddPrompt = () => {
+    if (!user) {
+      alert('Please sign in to add comments');
+      return;
+    }
+    setShowAddModal(true);
+  };
+
+  const handleReply = (comment: CommentTree) => {
+    if (!user) {
+      alert('Please sign in to reply');
+      return;
+    }
+    
+    setReplyingTo({
+      id: comment.id,
+      prompt: comment.prompt,
+      author: comment.profiles.display_name || 'Anonymous'
+    });
+    setShowAddModal(true);
+  };
 
   if (!params) return <div>Loading...</div>;
 
@@ -96,7 +145,12 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               <Heart className="w-3 h-3 mr-1" />
               0
             </Button>
-            <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="text-xs hover:bg-black hover:text-white h-6 px-2"
+              onClick={() => handleReply(comment)}
+            >
               Reply
             </Button>
           </div>
@@ -163,7 +217,11 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
                     <MessageSquare className="w-5 h-5" />
                     Prompt Comments
                   </CardTitle>
-                  <Button size="sm" className="bg-black text-white hover:bg-gray-800 rotate-[-2deg] hover:rotate-0 transition-transform">
+                  <Button 
+                    size="sm" 
+                    className="bg-black text-white hover:bg-gray-800 rotate-[-2deg] hover:rotate-0 transition-transform"
+                    onClick={handleAddPrompt}
+                  >
                     + Add Prompt
                   </Button>
                 </div>
@@ -209,6 +267,18 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
       </div>
       
       <KeyboardNav />
+      
+      {showAddModal && (
+        <AddCommentModal
+          postId={params.id}
+          parentComment={replyingTo || undefined}
+          onClose={() => {
+            setShowAddModal(false);
+            setReplyingTo(null);
+          }}
+          onSubmit={handleCommentSubmit}
+        />
+      )}
     </div>
   );
 }
