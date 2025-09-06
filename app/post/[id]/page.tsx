@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, MessageSquare, Zap } from "lucide-react";
+import { ArrowLeft, Heart, MessageSquare, Zap, Loader2, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { KeyboardNav } from "@/components/keyboard-nav";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
 import { useComments } from "@/hooks/useComments";
@@ -12,8 +12,10 @@ import { useCreateComment } from "@/hooks/useCreateComment";
 import { AddCommentModal } from "@/components/modal/add-comment-modal";
 import { useAuth } from "@/contexts/auth-context";
 import { useLikeComment } from "@/hooks/useLikeComment";
+import { usePost } from "@/hooks/usePost";
+import { useRouter } from 'next/navigation';
 
-// Updated to match real API data structure
+// Updated to include status field
 interface CommentTree {
   id: string
   post_id: string
@@ -22,6 +24,8 @@ interface CommentTree {
   prompt: string
   image_url: string
   created_at: string
+  status?: 'pending' | 'generating' | 'completed' | 'failed'
+  error?: string
   profiles: {
     id: string
     display_name: string | null
@@ -40,6 +44,7 @@ interface PostPageProps {
 
 export default function PostPage({ params: paramsPromise }: PostPageProps) {
   const [params, setParams] = useState<{ id: string } | null>(null);
+  const router = useRouter();
   
   const [showAddModal, setShowAddModal] = useState(false);
   const [replyingTo, setReplyingTo] = useState<{
@@ -55,7 +60,9 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     paramsPromise.then(setParams);
   }, [paramsPromise]);
 
-  // Use real API data
+  // Fetch the actual post data
+  const { post, loading: postLoading, error: postError } = usePost(params?.id || '');
+  
   const { comments, flattenedComments, loading, error, refetch, optimisticUpdateLikes } = useComments(params?.id || '');
   
   const { createComment } = useCreateComment();
@@ -68,11 +75,26 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     initialSelectedId: flattenedComments.length > 0 ? flattenedComments[0].id : ''
   });
 
+  // Polling for comment status updates
   useEffect(() => {
-    if (flattenedComments.length > 0 && !selectedItemId) {
-      // You might need to add setSelectedItemId to your hook's return value
+    if (!params?.id) return;
+    
+    // Check if any comments are still generating
+    const hasGeneratingComments = flattenedComments.some(
+      comment => comment.status === 'pending' || comment.status === 'generating'
+    );
+    
+    if (hasGeneratingComments) {
+      const interval = setInterval(() => {
+        refetch();
+      }, 3000); // Poll every 3 seconds
+      
+      return () => clearInterval(interval);
     }
-  }, [flattenedComments.length, selectedItemId]);
+  }, [flattenedComments, params?.id, refetch]);
+
+  // Get the selected comment
+  const selectedComment = flattenedComments.find(c => c.id === selectedItemId);
 
   const handleCommentSubmit = async (prompt: string) => {
     if (!params?.id) return;
@@ -109,7 +131,53 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     setShowAddModal(true);
   };
 
-  if (!params) return <div>Loading...</div>;
+  // Navigate back to feed
+  const handleBack = () => {
+    router.push('/feed');
+  };
+
+  // Status icon component
+  const StatusIcon = ({ status, error }: { status?: string, error?: string }) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="w-3 h-3 text-gray-500"/>;
+      case 'generating':
+        return <Loader2 className="w-3 h-3 animate-spin text-blue-500"/>;
+      case 'completed':
+        return <CheckCircle className="w-3 h-3 text-green-500"/>;
+      case 'failed':
+        return <AlertCircle className="w-3 h-3 text-red-500"/>;
+      default:
+        return null;
+    }
+  };
+
+  // Handle loading states
+  if (!params || postLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-black rotate-45 mx-auto mb-4 animate-pulse"></div>
+          <p className="font-mono">Loading post...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle post not found
+  if (postError || !post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="font-mono text-lg mb-4">{postError || 'Post not found'}</p>
+          <Button onClick={handleBack} variant="outline">
+            Back to Feed
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const CommentComponent = ({ comment }: { comment: CommentTree }) => {
     const isSelected = selectedItemId === comment.id;
@@ -117,12 +185,15 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     
     // Use inline styles for reliable indentation
     const indentStyle = {
-      marginLeft: comment.depth * 24 + 'px', // 24px per level
+      marginLeft: comment.depth * 24 + 'px',
       position: 'relative' as const
     };
 
     return (
-      <div className="relative">
+      <div 
+        className="relative cursor-pointer"
+        onClick={() => setSelectedItemId(comment.id)}
+      >
         {/* Threading line for non-root comments */}
         {comment.depth > 0 && (
           <div 
@@ -138,7 +209,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
         <div 
           style={indentStyle}
           className={`
-            border-2 border-black p-2 cursor-pointer transition-all duration-200
+            border-2 border-black p-2 transition-all duration-200
             ${comment.depth > 0 ? 'bg-yellow-100' : 'bg-gray-50'}
             ${isSelected 
               ? 'ring-4 ring-black ring-opacity-50 rotate-0 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] scale-[1.02]' 
@@ -158,7 +229,6 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
             />
           )}
           
-          {/* Rest of your component stays the same */}
           <div className="flex items-center gap-2 mb-1">
             <div className={`w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold ${comment.depth === 0 ? 'bg-black' : 'bg-gray-800'}`}>
               {(comment.profiles.display_name || 'Anonymous').charAt(0).toUpperCase()}
@@ -169,6 +239,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
             <Badge variant="outline" className="text-xs border-black px-1 py-0">
               {comment.depth === 0 ? 'Root' : `Level ${comment.depth}`}
             </Badge>
+            <StatusIcon status={comment.status} error={comment.error} />
           </div>
           <p className="text-xs mb-1 font-mono">&quot;{comment.prompt}&quot;</p>
           <div className="flex gap-2">
@@ -176,15 +247,12 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               size="sm" 
               variant="ghost" 
               className="text-xs hover:bg-black hover:text-white h-6 px-2"
-              onClick={async () => {
+              onClick={async (e) => {
+                e.stopPropagation(); // Prevent comment selection
                 try {
-                  // Optimistic update first
                   optimisticUpdateLikes(comment.id, comment.likes_count === 0);
-                  
-                  // Then make API call (no refetch needed!)
                   await toggleLike(comment.id);
                 } catch (error) {
-                  // On error, refetch to restore correct state
                   await refetch();
                 }
               }}
@@ -196,7 +264,10 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               size="sm" 
               variant="ghost" 
               className="text-xs hover:bg-black hover:text-white h-6 px-2"
-              onClick={() => handleReply(comment)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleReply(comment);
+              }}
             >
               Reply
             </Button>
@@ -206,27 +277,89 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     );
   };
 
+  // Update displayImage to use real post data
+  const displayImage = () => {
+    if (selectedComment) {
+      // Show selected comment's image or status
+      if (selectedComment.status === 'completed' && selectedComment.image_url) {
+        return (
+          <img 
+            src={selectedComment.image_url} 
+            alt={selectedComment.prompt}
+            className="w-full h-full object-cover rounded-lg"
+          />
+        );
+      } else if (selectedComment.status === 'generating') {
+        return (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="bg-black text-white rounded-lg p-8 animate-pulse">
+              <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin" />
+              <p className="text-lg font-mono">Generating image...</p>
+              <p className="text-sm opacity-75 mt-2">"{selectedComment.prompt}"</p>
+            </div>
+          </div>
+        );
+      } else if (selectedComment.status === 'pending') {
+        return (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="bg-gray-100 border-2 border-dashed border-gray-400 rounded-lg p-8">
+              <Clock className="w-12 h-12 mx-auto mb-4 text-gray-600" />
+              <p className="text-lg font-mono text-gray-700">Waiting to start...</p>
+              <p className="text-sm text-gray-500 mt-2">"{selectedComment.prompt}"</p>
+            </div>
+          </div>
+        );
+      } else if (selectedComment.status === 'failed') {
+        return (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="bg-red-50 border-2 border-red-500 rounded-lg p-8">
+              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+              <p className="text-lg font-mono text-red-700">Generation failed</p>
+              <p className="text-sm text-red-600 mt-2">{selectedComment.error || 'Unknown error'}</p>
+            </div>
+          </div>
+        );
+      }
+    }
+    
+    // Show actual post image instead of mock
+    return (
+      <img 
+        src={post.image_url} 
+        alt={post.title}
+        className="w-full h-full object-cover rounded-lg"
+      />
+    );
+  };
+
   return (
     <div className="h-screen bg-white p-3 overflow-hidden">
       <div className="max-w-6xl mx-auto h-full flex flex-col">
-        {/* Quirky header */}
+        {/* Updated header with real post data */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" className="rotate-[-2deg] hover:rotate-0 transition-transform">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rotate-[-2deg] hover:rotate-0 transition-transform"
+              onClick={handleBack}
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
             <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h1 className="text-xl font-bold">Post #{params.id.slice(-8)}</h1>
+              <h1 className="text-xl font-bold">{post.title}</h1>
+              <p className="text-xs opacity-75">by {post.profile?.display_name || 'Anonymous'}</p>
             </div>
           </div>
           
           <div className="flex gap-3">
-            <Badge variant="outline" className="rotate-[-1deg] border-2 border-black font-mono">
-              🍌 nano banana
+            <Badge variant="outline" className="rotate-[-1deg] border-2 border-black">
+              <Heart className="w-3 h-3 mr-1" />
+              {post.likes_count || 0}
             </Badge>
-            <Badge variant="outline" className="rotate-[2deg] border-2 border-black">
-              LIVE
+            <Badge variant="outline" className="rotate-[2deg] border-2 border-black font-mono">
+              🍌 nano banana
             </Badge>
           </div>
         </div>
@@ -237,15 +370,13 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
           <div className="space-y-4">
             <Card className="border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rotate-[-0.5deg] hover:rotate-0 transition-transform h-full">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-mono">Current Edit</CardTitle>
+                <CardTitle className="text-lg font-mono">
+                  {selectedComment ? `Edit: "${selectedComment.prompt}"` : 'Original Image'}
+                </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1">
-                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-dashed border-black rounded-lg flex items-center justify-center relative overflow-hidden">
-                  <div className="text-center p-8">
-                    <Zap className="w-12 h-12 mx-auto mb-4 rotate-12" />
-                    <p className="text-lg font-semibold mb-2">Original Image</p>
-                    <p className="text-sm text-gray-600 font-mono">Ready for nano banana magic ✨</p>
-                  </div>
+              <CardContent className="flex-1 p-4">
+                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-dashed border-black rounded-lg relative overflow-hidden">
+                  {displayImage()}
                   
                   {/* Playful corner decoration */}
                   <div className="absolute top-2 right-2 w-8 h-8 bg-black rotate-45"></div>
