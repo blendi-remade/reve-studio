@@ -92,34 +92,46 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     const isChild = !comment.isRoot;
     
     return (
-      <div 
-        className={`
-          border-2 border-black p-4 cursor-pointer transition-all duration-200
-          ${isChild ? 'ml-6 bg-yellow-100' : 'bg-gray-50'}
-          ${isSelected 
-            ? 'ring-4 ring-black ring-opacity-50 rotate-0 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] scale-[1.02]' 
-            : 'rotate-[-0.5deg] hover:rotate-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-          }
-        `}
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <div className={`w-8 h-8 text-white rounded-full flex items-center justify-center text-sm font-bold ${isChild ? 'bg-gray-800' : 'bg-black'}`}>
-            {comment.author.charAt(0).toUpperCase()}
+      <div className="relative">
+        {/* Threading line for child comments */}
+        {isChild && (
+          <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-black opacity-20"></div>
+        )}
+        
+        <div 
+          className={`
+            border-2 border-black p-2 cursor-pointer transition-all duration-200 relative
+            ${isChild ? 'ml-8 bg-yellow-100' : 'bg-gray-50'}
+            ${isSelected 
+              ? 'ring-4 ring-black ring-opacity-50 rotate-0 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] scale-[1.02]' 
+              : 'rotate-[-0.5deg] hover:rotate-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+            }
+          `}
+        >
+          {/* Connection line to parent for child comments */}
+          {isChild && (
+            <div className="absolute -left-8 top-2 w-8 h-0.5 bg-black opacity-20"></div>
+          )}
+          
+          <div className="flex items-center gap-2 mb-1">
+            <div className={`w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold ${isChild ? 'bg-gray-800' : 'bg-black'}`}>
+              {comment.author.charAt(0).toUpperCase()}
+            </div>
+            <span className="font-semibold text-sm">{comment.author}</span>
+            <Badge variant="outline" className="text-xs border-black px-1 py-0">
+              {comment.isRoot ? 'Root' : 'Child'}
+            </Badge>
           </div>
-          <span className="font-semibold">{comment.author}</span>
-          <Badge variant="outline" className="text-xs border-black">
-            {comment.isRoot ? 'Root' : 'Child'}
-          </Badge>
-        </div>
-        <p className="text-sm mb-3 font-mono">"{comment.prompt}"</p>
-        <div className="flex gap-3">
-          <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white">
-            <Heart className="w-3 h-3 mr-1" />
-            {comment.likes}
-          </Button>
-          <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white">
-            Reply
-          </Button>
+          <p className="text-xs mb-1 font-mono">"{comment.prompt}"</p>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
+              <Heart className="w-3 h-3 mr-1" />
+              {comment.likes}
+            </Button>
+            <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
+              Reply
+            </Button>
+          </div>
         </div>
       </div>
     );
