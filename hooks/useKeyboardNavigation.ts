@@ -47,6 +47,12 @@ export function useKeyboardNavigation<T>({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip navigation if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
       if (!enabledKeys.includes(e.key)) return;
       
       e.preventDefault();
