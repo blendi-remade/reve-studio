@@ -70,16 +70,9 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
 
   useEffect(() => {
     if (flattenedComments.length > 0 && !selectedItemId) {
-      console.log('🔧 Manually setting first comment as selected');
       // You might need to add setSelectedItemId to your hook's return value
     }
   }, [flattenedComments.length, selectedItemId]);
-
-  console.log('🔍 Debug keyboard nav:', {
-    flattenedComments: flattenedComments.length,
-    selectedItemId,
-    firstCommentId: flattenedComments[0]?.id
-  });
 
   const handleCommentSubmit = async (prompt: string) => {
     if (!params?.id) return;
@@ -120,39 +113,61 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
 
   const CommentComponent = ({ comment }: { comment: CommentTree }) => {
     const isSelected = selectedItemId === comment.id;
-    const isChild = comment.depth > 0;
+    const isRoot = comment.depth === 0;
     
+    // Use inline styles for reliable indentation
+    const indentStyle = {
+      marginLeft: comment.depth * 24 + 'px', // 24px per level
+      position: 'relative' as const
+    };
+
     return (
       <div className="relative">
-        {/* Threading line for child comments */}
-        {isChild && (
-          <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-black opacity-20"></div>
+        {/* Threading line for non-root comments */}
+        {comment.depth > 0 && (
+          <div 
+            className="absolute w-0.5 bg-black opacity-20"
+            style={{
+              left: (comment.depth * 24 - 12) + 'px',
+              top: 0,
+              bottom: 0
+            }}
+          />
         )}
         
         <div 
+          style={indentStyle}
           className={`
-            border-2 border-black p-2 cursor-pointer transition-all duration-200 relative
-            ${isChild ? 'ml-8 bg-yellow-100' : 'bg-gray-50'}
+            border-2 border-black p-2 cursor-pointer transition-all duration-200
+            ${comment.depth > 0 ? 'bg-yellow-100' : 'bg-gray-50'}
             ${isSelected 
               ? 'ring-4 ring-black ring-opacity-50 rotate-0 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] scale-[1.02]' 
               : 'rotate-[-0.5deg] hover:rotate-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
             }
           `}
         >
-          {/* Connection line to parent for child comments */}
-          {isChild && (
-            <div className="absolute -left-8 top-2 w-8 h-0.5 bg-black opacity-20"></div>
+          {/* Connection line to parent */}
+          {comment.depth > 0 && (
+            <div 
+              className="absolute h-0.5 bg-black opacity-20"
+              style={{
+                left: '-12px',
+                top: '12px',
+                width: '12px'
+              }}
+            />
           )}
           
+          {/* Rest of your component stays the same */}
           <div className="flex items-center gap-2 mb-1">
-            <div className={`w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold ${isChild ? 'bg-gray-800' : 'bg-black'}`}>
+            <div className={`w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold ${comment.depth === 0 ? 'bg-black' : 'bg-gray-800'}`}>
               {(comment.profiles.display_name || 'Anonymous').charAt(0).toUpperCase()}
             </div>
             <span className="font-semibold text-sm">
               {comment.profiles.display_name || 'Anonymous'}
             </span>
             <Badge variant="outline" className="text-xs border-black px-1 py-0">
-              {comment.depth === 0 ? 'Root' : 'Child'}
+              {comment.depth === 0 ? 'Root' : `Level ${comment.depth}`}
             </Badge>
           </div>
           <p className="text-xs mb-1 font-mono">&quot;{comment.prompt}&quot;</p>
