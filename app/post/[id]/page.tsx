@@ -11,6 +11,7 @@ import { useComments } from "@/hooks/useComments";
 import { useCreateComment } from "@/hooks/useCreateComment";
 import { AddCommentModal } from "@/components/modal/add-comment-modal";
 import { useAuth } from "@/contexts/auth-context";
+import { useLikeComment } from "@/hooks/useLikeComment";
 
 // Updated to match real API data structure
 interface CommentTree {
@@ -28,6 +29,7 @@ interface CommentTree {
   }
   children: CommentTree[]
   depth: number
+  likes_count: number;
 }
 
 interface PostPageProps {
@@ -54,9 +56,10 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
   }, [paramsPromise]);
 
   // Use real API data
-  const { comments, flattenedComments, loading, error, refetch } = useComments(params?.id || '');
+  const { comments, flattenedComments, loading, error, refetch, optimisticUpdateLikes } = useComments(params?.id || '');
   
   const { createComment } = useCreateComment();
+  const { toggleLike } = useLikeComment();
 
   // Use keyboard navigation with real data
   const { selectedItemId } = useKeyboardNavigation({
@@ -141,9 +144,25 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
           </div>
           <p className="text-xs mb-1 font-mono">&quot;{comment.prompt}&quot;</p>
           <div className="flex gap-2">
-            <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="text-xs hover:bg-black hover:text-white h-6 px-2"
+              onClick={async () => {
+                try {
+                  // Optimistic update first
+                  optimisticUpdateLikes(comment.id, comment.likes_count === 0);
+                  
+                  // Then make API call (no refetch needed!)
+                  await toggleLike(comment.id);
+                } catch (error) {
+                  // On error, refetch to restore correct state
+                  await refetch();
+                }
+              }}
+            >
               <Heart className="w-3 h-3 mr-1" />
-              0
+              {comment.likes_count || 0}
             </Button>
             <Button 
               size="sm" 

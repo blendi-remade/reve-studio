@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Comment } from '@/lib/types/domain.types'
 
 // Extended comment type that matches what our API returns
 interface CommentWithProfile {
@@ -20,6 +19,7 @@ interface CommentWithProfile {
 interface CommentTree extends CommentWithProfile {
   children: CommentTree[]
   depth: number
+  likes_count: number
 }
 
 interface UseCommentsResult {
@@ -28,6 +28,7 @@ interface UseCommentsResult {
   loading: boolean
   error: string | null
   refetch: () => Promise<void>
+  optimisticUpdateLikes: (commentId: string, increment: boolean) => void
 }
 
 export function useComments(postId: string): UseCommentsResult {
@@ -64,6 +65,29 @@ export function useComments(postId: string): UseCommentsResult {
     }
   }
 
+  const optimisticUpdateLikes = (commentId: string, increment: boolean) => {
+    setComments(prev => updateCommentLikes(prev, commentId, increment))
+    setFlattenedComments(prev => updateCommentLikes(prev, commentId, increment))
+  }
+
+  const updateCommentLikes = (comments: CommentTree[], commentId: string, increment: boolean): CommentTree[] => {
+    return comments.map(comment => {
+      if (comment.id === commentId) {
+        return {
+          ...comment,
+          likes_count: Math.max(0, comment.likes_count + (increment ? 1 : -1))
+        }
+      }
+      if (comment.children.length > 0) {
+        return {
+          ...comment,
+          children: updateCommentLikes(comment.children, commentId, increment)
+        }
+      }
+      return comment
+    })
+  }
+
   useEffect(() => {
     if (postId) {
       fetchComments()
@@ -75,6 +99,7 @@ export function useComments(postId: string): UseCommentsResult {
     flattenedComments,
     loading,
     error,
-    refetch: fetchComments
+    refetch: fetchComments,
+    optimisticUpdateLikes
   }
 }

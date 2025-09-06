@@ -3,10 +3,10 @@ import { CommentService } from '@/lib/services/comment.service'
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
   try {
-    const { id: postId } = await params
+    const { postId } = await params
     
     const commentService = CommentService.create()
     const comments = await commentService.getCommentsByPost(postId)
