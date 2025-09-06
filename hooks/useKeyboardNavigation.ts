@@ -19,7 +19,7 @@ export function useKeyboardNavigation<T>({
   items,
   getItemId,
   initialSelectedId,
-  enabledKeys = ['j', 'k']
+  enabledKeys = ['j', 'k', 'Tab']  // Add Tab to enabled keys
 }: KeyboardNavigationOptions<T>): KeyboardNavigationResult<T> {
   
   const [selectedItemId, setSelectedItemId] = useState<string | null>(
@@ -28,6 +28,13 @@ export function useKeyboardNavigation<T>({
 
   const navigationOrder = items.map(getItemId);
   const selectedItem = items.find(item => getItemId(item) === selectedItemId) || null;
+
+  // Auto-select first item when items load
+  useEffect(() => {
+    if (items.length > 0 && !selectedItemId) {
+      setSelectedItemId(getItemId(items[0]));
+    }
+  }, [items.length, selectedItemId, items, getItemId]);
 
   const navigateNext = () => {
     if (!selectedItemId) return;
@@ -45,9 +52,41 @@ export function useKeyboardNavigation<T>({
     }
   };
 
+  // Navigate to next root comment only
+  const navigateToNextRoot = () => {
+    if (!selectedItemId || items.length === 0) return;
+    
+    // Find all root comments (depth === 0)
+    const rootComments = items.filter((item: any) => item.depth === 0);
+    if (rootComments.length === 0) return;
+    
+    // Find current comment
+    const currentComment = items.find(item => getItemId(item) === selectedItemId);
+    if (!currentComment) return;
+    
+    // Find which root we're currently under
+    let currentRootId = getItemId(currentComment);
+    if ((currentComment as any).depth > 0) {
+      // Find the root parent by going backwards in list
+      const currentIndex = items.findIndex(item => getItemId(item) === selectedItemId);
+      for (let i = currentIndex; i >= 0; i--) {
+        if ((items[i] as any).depth === 0) {
+          currentRootId = getItemId(items[i]);
+          break;
+        }
+      }
+    }
+    
+    // Find next root comment
+    const currentRootIndex = rootComments.findIndex(item => getItemId(item) === currentRootId);
+    if (currentRootIndex < rootComments.length - 1) {
+      setSelectedItemId(getItemId(rootComments[currentRootIndex + 1]));
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Skip navigation if user is typing in an input field
+      // Skip navigation if user is typing
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
@@ -61,24 +100,14 @@ export function useKeyboardNavigation<T>({
         navigateNext();
       } else if (e.key === 'k') {
         navigatePrevious();
+      } else if (e.key === 'Tab') {
+        navigateToNextRoot();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedItemId, navigationOrder, enabledKeys]);
-
-  useEffect(() => {
-    // Auto-select first item when items are loaded and no item is selected
-    if (items.length > 0 && !selectedItemId) {
-      console.log('🔧 Auto-selecting first item:', getItemId(items[0]));
-      setSelectedItemId(getItemId(items[0]));
-    }
-    // Clear selection if no items
-    else if (items.length === 0 && selectedItemId) {
-      setSelectedItemId(null);
-    }
-  }, [items.length, selectedItemId, items, getItemId]);
+  }, [selectedItemId, navigationOrder, enabledKeys, items]);
 
   return {
     selectedItem,
