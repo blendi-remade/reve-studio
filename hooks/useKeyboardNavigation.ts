@@ -13,18 +13,20 @@ export interface KeyboardNavigationResult<T> {
   setSelectedItemId: (id: string) => void;
   navigateNext: () => void;
   navigatePrevious: () => void;
+  isSpacePressed: boolean; // Add this to track space key state
 }
 
 export function useKeyboardNavigation<T>({
   items,
   getItemId,
   initialSelectedId,
-  enabledKeys = ['j', 'k', 'Tab']  // Add Tab to enabled keys
+  enabledKeys = ['j', 'k', 'Tab', ' ']  // Add space to enabled keys
 }: KeyboardNavigationOptions<T>): KeyboardNavigationResult<T> {
   
   const [selectedItemId, setSelectedItemId] = useState<string | null>(
     initialSelectedId || (items.length > 0 ? getItemId(items[0]) : null)
   );
+  const [isSpacePressed, setIsSpacePressed] = useState(false); // Track space key state
 
   const navigationOrder = items.map(getItemId);
   const selectedItem = items.find(item => getItemId(item) === selectedItemId) || null;
@@ -94,6 +96,13 @@ export function useKeyboardNavigation<T>({
 
       if (!enabledKeys.includes(e.key)) return;
       
+      // Handle space key separately - don't prevent default for space
+      if (e.key === ' ') {
+        e.preventDefault(); // Prevent page scroll
+        setIsSpacePressed(true);
+        return;
+      }
+      
       e.preventDefault();
       
       if (e.key === 'j') {
@@ -105,8 +114,19 @@ export function useKeyboardNavigation<T>({
       }
     };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === ' ') {
+        setIsSpacePressed(false);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [selectedItemId, navigationOrder, enabledKeys, items]);
 
   return {
@@ -114,6 +134,7 @@ export function useKeyboardNavigation<T>({
     selectedItemId,
     setSelectedItemId,
     navigateNext,
-    navigatePrevious
+    navigatePrevious,
+    isSpacePressed // Return the space key state
   };
 }
