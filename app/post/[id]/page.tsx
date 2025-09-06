@@ -62,10 +62,23 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
   const { toggleLike } = useLikeComment();
 
   // Use keyboard navigation with real data
-  const { selectedItemId } = useKeyboardNavigation({
+  const { selectedItemId, setSelectedItemId } = useKeyboardNavigation({
     items: flattenedComments,
     getItemId: (comment) => comment.id,
-    initialSelectedId: flattenedComments[0]?.id || ''
+    initialSelectedId: flattenedComments.length > 0 ? flattenedComments[0].id : ''
+  });
+
+  useEffect(() => {
+    if (flattenedComments.length > 0 && !selectedItemId) {
+      console.log('🔧 Manually setting first comment as selected');
+      // You might need to add setSelectedItemId to your hook's return value
+    }
+  }, [flattenedComments.length, selectedItemId]);
+
+  console.log('🔍 Debug keyboard nav:', {
+    flattenedComments: flattenedComments.length,
+    selectedItemId,
+    firstCommentId: flattenedComments[0]?.id
   });
 
   const handleCommentSubmit = async (prompt: string) => {

@@ -62,6 +62,18 @@ export function useKeyboardNavigation<T>({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedItemId, navigationOrder, enabledKeys]);
 
+  useEffect(() => {
+    // Auto-select first item when items are loaded and no item is selected
+    if (items.length > 0 && !selectedItemId) {
+      console.log('🔧 Auto-selecting first item:', getItemId(items[0]));
+      setSelectedItemId(getItemId(items[0]));
+    }
+    // Clear selection if no items
+    else if (items.length === 0 && selectedItemId) {
+      setSelectedItemId(null);
+    }
+  }, [items.length, selectedItemId, items, getItemId]);
+
   return {
     selectedItem,
     selectedItemId,
