@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { LogOut, User, Zap, Settings } from 'lucide-react'
+import { LogOut, Zap } from 'lucide-react'
 
 export function ProfileDropdown() {
   const { user, profile, signOut } = useAuth()
@@ -94,46 +93,20 @@ export function ProfileDropdown() {
                 </div>
               </div>
 
-              {/* Menu items */}
-              <div className="space-y-1">
-                <button
-                  className="w-full flex items-center gap-3 px-3 py-2 text-sm font-mono hover:bg-black hover:text-white transition-colors duration-200 rounded rotate-[-0.5deg] hover:rotate-0"
-                  onClick={() => {
-                    // Navigate to profile page
-                    setIsOpen(false)
-                  }}
-                >
-                  <User className="w-4 h-4" />
-                  <span>My Profile</span>
-                </button>
-
-                <button
-                  className="w-full flex items-center gap-3 px-3 py-2 text-sm font-mono hover:bg-black hover:text-white transition-colors duration-200 rounded rotate-[0.5deg] hover:rotate-0"
-                  onClick={() => {
-                    // Navigate to settings
-                    setIsOpen(false)
-                  }}
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>Settings</span>
-                </button>
-
-                <div className="border-t-2 border-black border-dashed my-2"></div>
-
-                <button
-                  className="w-full flex items-center gap-3 px-3 py-2 text-sm font-mono hover:bg-red-500 hover:text-white transition-colors duration-200 rounded rotate-[-0.5deg] hover:rotate-0"
-                  onClick={async () => {
-                    await signOut()
-                    setIsOpen(false)
-                  }}
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out</span>
-                </button>
-              </div>
+              {/* Sign out button */}
+              <button
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm font-mono hover:bg-red-500 hover:text-white transition-colors duration-200 rounded rotate-[-0.5deg] hover:rotate-0 mb-3"
+                onClick={async () => {
+                  await signOut()
+                  setIsOpen(false)
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
 
               {/* Fun footer */}
-              <div className="mt-3 pt-3 border-t-2 border-black border-dashed">
+              <div className="pt-3 border-t-2 border-black border-dashed">
                 <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
                   <Zap className="w-3 h-3" />
                   <span className="font-mono rotate-[2deg]">Powered by 🍌</span>
