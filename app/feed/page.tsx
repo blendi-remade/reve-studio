@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { CreatePostModal } from '@/components/modal/create-post-modal'
+import { PostCard } from '@/components/post-card'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Plus, Heart, MessageSquare, TrendingUp, Clock } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { Plus, TrendingUp, Clock } from 'lucide-react'
 import { PostWithProfile } from '@/lib/types/domain.types'
 
 export default function FeedPage() {
@@ -14,7 +12,6 @@ export default function FeedPage() {
   const [posts, setPosts] = useState<PostWithProfile[]>([])
   const [sortBy, setSortBy] = useState<'likes' | 'date'>('likes')
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
     fetchPosts()
@@ -33,6 +30,17 @@ export default function FeedPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleLikeUpdate = (postId: string, newLikesCount: number, isLiked: boolean) => {
+    // Update the local posts state with the new like count
+    setPosts(currentPosts => 
+      currentPosts.map(post => 
+        post.id === postId 
+          ? { ...post, likes_count: newLikesCount }
+          : post
+      )
+    )
   }
 
   if (loading) {
@@ -96,46 +104,15 @@ export default function FeedPage() {
               </Button>
             </div>
 
-            {/* Posts grid */}
+            {/* Posts grid using PostCard component */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts.map((post, index) => (
-                <Card
+                <PostCard
                   key={post.id}
-                  onClick={() => router.push(`/post/${post.id}`)}
-                  className={`border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-200 rotate-[${index % 2 === 0 ? '-' : ''}0.5deg] hover:rotate-0`}
-                >
-                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 border-b-2 border-black">
-                    {post.image_url ? (
-                      <img
-                        src={post.image_url}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <p className="font-mono text-gray-500">Image Preview</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg mb-2 line-clamp-2">{post.title}</h3>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1">
-                          <Heart className="w-4 h-4" />
-                          {post.likes_count}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" />
-                          0
-                        </span>
-                      </div>
-                      <Badge variant="outline" className="border-black text-xs">
-                        by {post.profile?.display_name || 'Anonymous'}
-                      </Badge>
-                    </div>
-                  </div>
-                </Card>
+                  post={post}
+                  index={index}
+                  onLikeUpdate={handleLikeUpdate}
+                />
               ))}
             </div>
           </>
