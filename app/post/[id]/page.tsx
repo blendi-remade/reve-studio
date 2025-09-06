@@ -227,10 +227,25 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
-            <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h1 className="text-xl font-bold">
-                {postLoading ? 'Loading...' : (post?.title || `Post #${params.id.slice(-8)}`)}
-              </h1>
+            
+            <div className="flex items-center gap-3">
+              <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <h1 className="text-xl font-bold">
+                  {postLoading ? 'Loading...' : (post?.title || `Post #${params.id.slice(-8)}`)}
+                </h1>
+              </div>
+              
+              {/* Author info */}
+              {post && !postLoading && (
+                <div className="flex items-center gap-2 border-2 border-black bg-gray-100 px-3 py-2 rotate-[-0.5deg] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    {(post.profiles.display_name || 'Anonymous').charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-semibold">
+                    by {post.profiles.display_name || 'Anonymous'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           

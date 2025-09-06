@@ -1,14 +1,28 @@
 import { useState, useEffect } from 'react'
 import { Post } from '@/lib/types/domain.types'
 
+interface PostWithProfile {
+  id: string
+  user_id: string
+  title: string
+  image_url: string
+  likes_count: number
+  created_at: string
+  profiles: {
+    id: string
+    display_name: string | null
+    avatar_url: string | null
+  }
+}
+
 interface UsePostResult {
-  post: Post | null
+  post: PostWithProfile | null
   loading: boolean
   error: string | null
 }
 
 export function usePost(postId: string): UsePostResult {
-  const [post, setPost] = useState<Post | null>(null)
+  const [post, setPost] = useState<PostWithProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
