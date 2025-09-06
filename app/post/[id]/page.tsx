@@ -7,15 +7,24 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Heart, MessageSquare, Zap } from "lucide-react";
 import { KeyboardNav } from "@/components/keyboard-nav";
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation";
+import { useComments } from "@/hooks/useComments";
 
-interface Comment {
-  id: string;
-  author: string;
-  prompt: string;
-  parentId: string | null;
-  createdAt: string;
-  likes: number;
-  isRoot: boolean;
+// Updated to match real API data structure
+interface CommentTree {
+  id: string
+  post_id: string
+  parent_id: string | null
+  user_id: string
+  prompt: string
+  image_url: string
+  created_at: string
+  profiles: {
+    id: string
+    display_name: string | null
+    avatar_url: string | null
+  }
+  children: CommentTree[]
+  depth: number
 }
 
 interface PostPageProps {
@@ -32,49 +41,21 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     paramsPromise.then(setParams);
   }, [paramsPromise]);
 
-  // Mock data - this will come from your backend later
-  const mockComments: Comment[] = [
-    {
-      id: 'comment-1',
-      author: 'user123',
-      prompt: 'Add a rainbow in the sky',
-      parentId: null,
-      createdAt: '2024-01-01',
-      likes: 12,
-      isRoot: true,
-    },
-    {
-      id: 'comment-2', 
-      author: 'artist_ai',
-      prompt: 'Make it double rainbow!',
-      parentId: 'comment-1',
-      createdAt: '2024-01-01',
-      likes: 8,
-      isRoot: false,
-    },
-    {
-      id: 'comment-3',
-      author: 'colormaster',
-      prompt: 'Add some clouds too',
-      parentId: 'comment-2',
-      createdAt: '2024-01-01', 
-      likes: 5,
-      isRoot: false,
-    },
-  ];
+  // Use real API data
+  const { comments, flattenedComments, loading, error } = useComments(params?.id || '');
 
-  // Use the keyboard navigation hook
+  // Use keyboard navigation with real data
   const { selectedItemId } = useKeyboardNavigation({
-    items: mockComments,
+    items: flattenedComments,
     getItemId: (comment) => comment.id,
-    initialSelectedId: 'comment-1'
+    initialSelectedId: flattenedComments[0]?.id || ''
   });
 
   if (!params) return <div>Loading...</div>;
 
-  const CommentComponent = ({ comment }: { comment: Comment }) => {
+  const CommentComponent = ({ comment }: { comment: CommentTree }) => {
     const isSelected = selectedItemId === comment.id;
-    const isChild = !comment.isRoot;
+    const isChild = comment.depth > 0;
     
     return (
       <div className="relative">
@@ -100,18 +81,20 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
           
           <div className="flex items-center gap-2 mb-1">
             <div className={`w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold ${isChild ? 'bg-gray-800' : 'bg-black'}`}>
-              {comment.author.charAt(0).toUpperCase()}
+              {(comment.profiles.display_name || 'Anonymous').charAt(0).toUpperCase()}
             </div>
-            <span className="font-semibold text-sm">{comment.author}</span>
+            <span className="font-semibold text-sm">
+              {comment.profiles.display_name || 'Anonymous'}
+            </span>
             <Badge variant="outline" className="text-xs border-black px-1 py-0">
-              {comment.isRoot ? 'Root' : 'Child'}
+              {comment.depth === 0 ? 'Root' : 'Child'}
             </Badge>
           </div>
           <p className="text-xs mb-1 font-mono">&quot;{comment.prompt}&quot;</p>
           <div className="flex gap-2">
             <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
               <Heart className="w-3 h-3 mr-1" />
-              {comment.likes}
+              0
             </Button>
             <Button size="sm" variant="ghost" className="text-xs hover:bg-black hover:text-white h-6 px-2">
               Reply
@@ -133,7 +116,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               Back
             </Button>
             <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h1 className="text-xl font-bold">Post #{params.id}</h1>
+              <h1 className="text-xl font-bold">Post #{params.id.slice(-8)}</h1>
             </div>
           </div>
           
@@ -186,17 +169,39 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
                 </div>
               </CardHeader>
               <CardContent className="p-4 flex-1 overflow-y-auto">
-                <div className="space-y-4">
-                  {mockComments.map(comment => (
-                    <CommentComponent key={comment.id} comment={comment} />
-                  ))}
-                  
-                  <div className="text-center py-4">
-                    <p className="text-gray-500 font-mono text-sm rotate-[-1deg]">
-                      More prompts loading...
-                    </p>
+                {/* Loading State */}
+                {loading && (
+                  <div className="text-center py-8">
+                    <div className="w-8 h-8 bg-black rotate-45 mx-auto mb-4 animate-pulse"></div>
+                    <p className="font-mono text-sm">Loading comments...</p>
                   </div>
-                </div>
+                )}
+
+                {/* Error State */}
+                {error && (
+                  <div className="text-center py-8">
+                    <p className="text-red-600 font-mono text-sm">⚠️ {error}</p>
+                  </div>
+                )}
+
+                {/* Comments */}
+                {!loading && !error && (
+                  <div className="space-y-4">
+                    {comments.length > 0 ? (
+                      <>
+                        {flattenedComments.map(comment => (
+                          <CommentComponent key={comment.id} comment={comment} />
+                        ))}
+                      </>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 font-mono text-sm rotate-[-1deg]">
+                          No comments yet. Be the first to add a prompt! 🎨
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
