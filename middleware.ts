@@ -6,13 +6,18 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const response = NextResponse.next();
 
-    // Allow access to static assets and API routes
+    // Allow access to static assets, API routes, and auth callback
     if (
       pathname.startsWith('/_next/') ||
       pathname.startsWith('/api/') ||
       pathname === '/favicon.ico' ||
       pathname.match(/\.(svg|png|jpg|jpeg|gif|webp)$/)
     ) {
+      return response;
+    }
+
+    // IMPORTANT: Skip middleware for auth callback to prevent race conditions
+    if (pathname === '/api/auth/callback') {
       return response;
     }
 

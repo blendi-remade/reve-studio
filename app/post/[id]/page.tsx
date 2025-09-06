@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image'; // Add this import
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -66,8 +67,8 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
   const { createComment } = useCreateComment();
   const { toggleLike } = useLikeComment();
 
-  // Use keyboard navigation with real data
-  const { selectedItemId, setSelectedItemId } = useKeyboardNavigation({
+  // Use keyboard navigation with space key support
+  const { selectedItemId, setSelectedItemId, isSpacePressed } = useKeyboardNavigation({
     items: flattenedComments,
     getItemId: (comment) => comment.id,
     initialSelectedId: flattenedComments.length > 0 ? flattenedComments[0].id : ''
@@ -90,6 +91,23 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
       return () => clearInterval(interval);
     }
   }, [flattenedComments, params?.id, refetch]);
+
+  // Preload all comment images when comments change
+  useEffect(() => {
+    // Preload all completed comment images
+    flattenedComments.forEach(comment => {
+      if (comment.status === 'completed' && comment.image_url) {
+        const img = new window.Image();
+        img.src = comment.image_url;
+      }
+    });
+    
+    // Also preload the main post image
+    if (post?.image_url) {
+      const img = new window.Image();
+      img.src = post.image_url;
+    }
+  }, [flattenedComments, post]);
 
   // Get the selected comment
   const selectedComment = flattenedComments.find(c => c.id === selectedItemId);
@@ -275,16 +293,33 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
     );
   };
 
-  // Update displayImage to use real post data
+  // Update displayImage to check isSpacePressed
   const displayImage = () => {
+    // If space is pressed, always show the original image
+    if (isSpacePressed && post?.image_url) {
+      return (
+        <Image 
+          src={post.image_url} 
+          alt={post.title || 'Original image'}
+          fill
+          className="object-cover rounded-lg"
+          priority
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      );
+    }
+    
     if (selectedComment) {
       // Show selected comment's image or status
       if (selectedComment.status === 'completed' && selectedComment.image_url) {
         return (
-          <img 
+          <Image 
             src={selectedComment.image_url} 
             alt={selectedComment.prompt}
-            className="w-full h-full object-cover rounded-lg"
+            fill
+            className="object-cover rounded-lg"
+            priority // Load with priority since it's visible
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         );
       } else if (selectedComment.status === 'generating') {
@@ -320,14 +355,17 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
       }
     }
     
-    // Show actual post image instead of mock
-    return (
-      <img 
+    // Show actual post image
+    return post?.image_url ? (
+      <Image 
         src={post.image_url} 
-        alt={post.title}
-        className="w-full h-full object-cover rounded-lg"
+        alt={post.title || 'Post image'}
+        fill
+        className="object-cover rounded-lg"
+        priority
+        sizes="(max-width: 768px) 100vw, 50vw"
       />
-    );
+    ) : null;
   };
 
   return (
@@ -395,6 +433,22 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
                   {/* Playful corner decoration */}
                   <div className="absolute top-2 right-2 w-8 h-8 bg-black rotate-45"></div>
                   <div className="absolute bottom-2 left-2 w-6 h-6 bg-yellow-200 rotate-12 border-2 border-black"></div>
+                  
+                  {/* Hidden preload images */}
+                  <div className="hidden">
+                    {flattenedComments
+                      .filter(c => c.status === 'completed' && c.image_url)
+                      .map(comment => (
+                        <Image
+                          key={comment.id}
+                          src={comment.image_url!}
+                          alt=""
+                          width={1}
+                          height={1}
+                          priority={false}
+                        />
+                      ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
