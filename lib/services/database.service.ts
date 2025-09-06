@@ -56,6 +56,50 @@ export class DatabaseService {
     return data as T[]
   }
 
+  async queryWithCount<T = any>(
+    table: string,
+    options?: {
+      select?: string
+      eq?: Record<string, any>
+      limit?: number
+      offset?: number
+      orderBy?: { column: string; ascending?: boolean }
+      countRelation?: string
+    }
+  ): Promise<T[]> {
+    let query = this.supabase
+      .from(table)
+      .select(options?.select || '*')
+
+    if (options?.eq) {
+      Object.entries(options.eq).forEach(([key, value]) => {
+        query = query.eq(key, value)
+      })
+    }
+
+    if (options?.orderBy) {
+      query = query.order(options.orderBy.column, { 
+        ascending: options.orderBy.ascending ?? false
+      })
+    }
+
+    if (options?.limit) {
+      query = query.limit(options.limit)
+    }
+
+    if (options?.offset) {
+      query = query.range(
+        options.offset, 
+        options.offset + (options.limit || 10) - 1
+      )
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+    return data as T[]
+  }
+
   async findById<T = any>(table: string, id: string): Promise<T | null> {
     const { data, error } = await this.supabase
       .from(table)

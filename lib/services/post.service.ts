@@ -14,22 +14,28 @@ export class PostService {
 
   // Get posts ordered by likes (hot feed)
   async getPostsByLikes(limit = 20, offset = 0): Promise<PostWithProfile[]> {
-    return this.db.query<PostWithProfile>('posts', {
+    const posts = await this.db.query<PostWithProfile>('posts', {
       select: '*, profile:profiles(*)',
       orderBy: { column: 'likes_count', ascending: false },
       limit,
       offset
     })
+
+    // Add comment counts
+    return await this.addCommentCounts(posts)
   }
 
   // Get posts ordered by creation date (new feed)
   async getPostsByDate(limit = 20, offset = 0): Promise<PostWithProfile[]> {
-    return this.db.query<PostWithProfile>('posts', {
+    const posts = await this.db.query<PostWithProfile>('posts', {
       select: '*, profile:profiles(*)',
       orderBy: { column: 'created_at', ascending: false },
       limit,
       offset
     })
+
+    // Add comment counts
+    return await this.addCommentCounts(posts)
   }
 
   // Get a single post
@@ -96,5 +102,24 @@ export class PostService {
       limit,
       offset
     })
+  }
+
+  // Helper method to add comment counts
+  private async addCommentCounts(posts: PostWithProfile[]): Promise<PostWithProfile[]> {
+    const postsWithCounts = await Promise.all(
+      posts.map(async (post) => {
+        const comments = await this.db.query('comments', {
+          select: 'id',
+          eq: { post_id: post.id }
+        })
+        
+        return {
+          ...post,
+          comments_count: comments.length
+        }
+      })
+    )
+    
+    return postsWithCounts
   }
 }

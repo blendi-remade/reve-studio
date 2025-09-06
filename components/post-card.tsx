@@ -135,7 +135,20 @@ export function PostCard({ post, index, initialLikeStatus, onLikeUpdate }: PostC
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-bold text-lg mb-2 line-clamp-2">{post.title}</h3>
+        {/* Title and Author in a row */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-lg line-clamp-2 flex-1 mr-3">{post.title}</h3>
+          
+          {/* Author info - matching post page style */}
+          <div className="flex items-center gap-2 border-2 border-black bg-gray-100 px-2 py-1 rotate-[-0.5deg] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs">
+            <div className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">
+              {(post.profile?.display_name || 'Anonymous').charAt(0).toUpperCase()}
+            </div>
+            <span className="font-semibold">
+              {post.profile?.display_name || 'Anonymous'}
+            </span>
+          </div>
+        </div>
         
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-3">
@@ -145,17 +158,12 @@ export function PostCard({ post, index, initialLikeStatus, onLikeUpdate }: PostC
               <span className="transition-all duration-200">{likesCount}</span>
             </span>
             
-            {/* Comments count (placeholder for now) */}
+            {/* Comments count - use real data instead of hardcoded 0 */}
             <span className="flex items-center gap-1 font-mono">
               <MessageSquare className="w-4 h-4" />
-              0
+              {post.comments_count || 0}
             </span>
           </div>
-          
-          {/* Author badge */}
-          <Badge variant="outline" className="border-black text-xs rotate-[-1deg]">
-            by {post.profile?.display_name || 'Anonymous'}
-          </Badge>
         </div>
       </div>
     </Card>

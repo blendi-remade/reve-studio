@@ -9,6 +9,7 @@ export type CommentLike = Database['public']['Tables']['comment_likes']['Row']
 // Extended types with relations
 export type PostWithProfile = Post & {
   profile?: Profile
+  comments_count?: number  // Add this back
 }
 
 export type CommentWithProfile = Comment & {
