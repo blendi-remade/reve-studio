@@ -12,6 +12,7 @@ import { useCreateComment } from "@/hooks/useCreateComment";
 import { AddCommentModal } from "@/components/modal/add-comment-modal";
 import { useAuth } from "@/contexts/auth-context";
 import { useLikeComment } from "@/hooks/useLikeComment";
+import { usePost } from "@/hooks/usePost";
 
 // Updated to match real API data structure
 interface CommentTree {
@@ -60,6 +61,8 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
   
   const { createComment } = useCreateComment();
   const { toggleLike } = useLikeComment();
+
+  const { post, loading: postLoading } = usePost(params?.id || '');
 
   // Use keyboard navigation with real data
   const { selectedItemId, setSelectedItemId } = useKeyboardNavigation({
@@ -217,7 +220,9 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               Back
             </Button>
             <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h1 className="text-xl font-bold">Post #{params.id.slice(-8)}</h1>
+              <h1 className="text-xl font-bold">
+                {postLoading ? 'Loading...' : (post?.title || `Post #${params.id.slice(-8)}`)}
+              </h1>
             </div>
           </div>
           
