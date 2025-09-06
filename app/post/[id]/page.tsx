@@ -61,15 +61,6 @@ export default async function PostPage({ params }: PostPageProps) {
               </CardContent>
             </Card>
             
-            {/* Image navigation */}
-            <div className="flex gap-2 justify-center">
-              <Button size="sm" variant="outline" className="border-2 border-black hover:bg-black hover:text-white transition-colors">
-                ← Prev Edit
-              </Button>
-              <Button size="sm" variant="outline" className="border-2 border-black hover:bg-black hover:text-white transition-colors">
-                Next Edit →
-              </Button>
-            </div>
           </div>
           
           {/* Comments area - right side */}
