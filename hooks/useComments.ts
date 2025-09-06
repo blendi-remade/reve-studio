@@ -9,6 +9,8 @@ interface CommentWithProfile {
   prompt: string
   image_url: string
   created_at: string
+  status?: 'pending' | 'generating' | 'completed' | 'failed'
+  error?: string
   profiles: {
     id: string
     display_name: string | null
