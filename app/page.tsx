@@ -2,11 +2,13 @@
 
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
-import { Zap } from 'lucide-react'
+import { Zap, ArrowRight } from 'lucide-react'
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
-  const { signInWithGoogle, loading } = useAuth()
+  const { user, signInWithGoogle, loading } = useAuth()
+  const router = useRouter()
 
   if (loading) {
     return (
@@ -49,16 +51,26 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Sign in button */}
+          {/* Action button - conditional based on auth state */}
           <div className="pt-8">
-            <Button 
-              onClick={signInWithGoogle}
-              disabled={loading}
-              className="w-full max-w-sm h-14 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] text-lg font-semibold rotate-[-0.5deg] hover:rotate-0"
-            >
-              <GoogleIcon className="h-6 w-6 mr-3" />
-              Sign in with Google
-            </Button>
+            {user ? (
+              <Button 
+                onClick={() => router.push('/feed')}
+                className="w-full max-w-sm h-14 bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-all duration-200 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] text-lg font-semibold rotate-[-0.5deg] hover:rotate-0"
+              >
+                <ArrowRight className="h-6 w-6 mr-3" />
+                Go to Feed
+              </Button>
+            ) : (
+              <Button 
+                onClick={signInWithGoogle}
+                disabled={loading}
+                className="w-full max-w-sm h-14 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[6px] active:translate-y-[6px] text-lg font-semibold rotate-[-0.5deg] hover:rotate-0"
+              >
+                <GoogleIcon className="h-6 w-6 mr-3" />
+                Sign in with Google
+              </Button>
+            )}
           </div>
 
           {/* Footer decorations */}
