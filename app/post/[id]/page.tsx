@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image'; // Add this import
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,11 +67,17 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
   const { createComment } = useCreateComment();
   const { toggleLike } = useLikeComment();
 
-  // Use keyboard navigation with space key support
+  // Add ref for scrollable container
+  const commentsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Use keyboard navigation with auto-scroll
   const { selectedItemId, setSelectedItemId, isSpacePressed } = useKeyboardNavigation({
     items: flattenedComments,
     getItemId: (comment) => comment.id,
-    initialSelectedId: flattenedComments.length > 0 ? flattenedComments[0].id : ''
+    initialSelectedId: flattenedComments.length > 0 ? flattenedComments[0].id : '',
+    scrollContainerRef: commentsContainerRef,
+    scrollToElement: true,
+    elementIdPrefix: 'comment-'
   });
 
   // Polling for comment status updates
@@ -207,6 +213,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
 
     return (
       <div 
+        id={`comment-${comment.id}`} // Add ID for scrolling
         className="relative cursor-pointer"
         onClick={() => setSelectedItemId(comment.id)}
       >
@@ -472,7 +479,10 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 flex-1 overflow-y-auto banana-scroll min-h-0">
+              <CardContent 
+                ref={commentsContainerRef} // Add ref back
+                className="p-4 flex-1 overflow-y-auto banana-scroll min-h-0"
+              >
                 {/* Loading State */}
                 {loading && (
                   <div className="text-center py-8">

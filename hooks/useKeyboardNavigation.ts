@@ -5,6 +5,10 @@ export interface KeyboardNavigationOptions<T> {
   getItemId: (item: T) => string;
   initialSelectedId?: string;
   enabledKeys?: string[];
+  // Fix the type to accept nullable refs
+  scrollContainerRef?: React.RefObject<HTMLElement | null>;
+  scrollToElement?: boolean;
+  elementIdPrefix?: string; // Prefix for element IDs (e.g., 'comment-')
 }
 
 export interface KeyboardNavigationResult<T> {
@@ -13,20 +17,23 @@ export interface KeyboardNavigationResult<T> {
   setSelectedItemId: (id: string) => void;
   navigateNext: () => void;
   navigatePrevious: () => void;
-  isSpacePressed: boolean; // Add this to track space key state
+  isSpacePressed: boolean;
 }
 
 export function useKeyboardNavigation<T>({
   items,
   getItemId,
   initialSelectedId,
-  enabledKeys = ['j', 'k', 'Tab', ' ']  // Add space to enabled keys
+  enabledKeys = ['j', 'k', 'Tab', ' '],
+  scrollContainerRef,
+  scrollToElement = false,
+  elementIdPrefix = ''
 }: KeyboardNavigationOptions<T>): KeyboardNavigationResult<T> {
   
   const [selectedItemId, setSelectedItemId] = useState<string | null>(
     initialSelectedId || (items.length > 0 ? getItemId(items[0]) : null)
   );
-  const [isSpacePressed, setIsSpacePressed] = useState(false); // Track space key state
+  const [isSpacePressed, setIsSpacePressed] = useState(false);
 
   const navigationOrder = items.map(getItemId);
   const selectedItem = items.find(item => getItemId(item) === selectedItemId) || null;
@@ -37,6 +44,29 @@ export function useKeyboardNavigation<T>({
       setSelectedItemId(getItemId(items[0]));
     }
   }, [items.length, selectedItemId, items, getItemId]);
+
+  // Auto-scroll to selected element
+  useEffect(() => {
+    if (scrollToElement && selectedItemId && scrollContainerRef?.current) {
+      const elementId = elementIdPrefix ? `${elementIdPrefix}${selectedItemId}` : selectedItemId;
+      const selectedElement = document.getElementById(elementId);
+      
+      if (selectedElement) {
+        const container = scrollContainerRef.current;
+        const containerHeight = container.clientHeight;
+        const elementHeight = selectedElement.offsetHeight;
+        
+        // Calculate scroll position to center the element
+        const elementTop = selectedElement.offsetTop - container.offsetTop;
+        const scrollTop = elementTop - (containerHeight / 2) + (elementHeight / 2);
+        
+        container.scrollTo({
+          top: Math.max(0, scrollTop),
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [selectedItemId, scrollToElement, scrollContainerRef, elementIdPrefix]);
 
   const navigateNext = () => {
     if (!selectedItemId) return;
@@ -135,6 +165,6 @@ export function useKeyboardNavigation<T>({
     setSelectedItemId,
     navigateNext,
     navigatePrevious,
-    isSpacePressed // Return the space key state
+    isSpacePressed
   };
 }
