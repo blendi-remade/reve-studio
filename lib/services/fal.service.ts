@@ -28,7 +28,8 @@ export interface FalWebhookPayload {
     }
   
     /**
-     * Submit an image edit request to fal.ai model
+     * Submit an image edit request to fal.ai Reve model
+     * @see https://fal.ai/models/fal-ai/reve/edit/api
      */
     async submitImageEdit({
       prompt,
@@ -40,7 +41,7 @@ export interface FalWebhookPayload {
       requestId: string
     }): Promise<{ request_id: string }> {
       const response = await fetch(
-        `https://queue.fal.run/fal-ai/nano-banana/edit?fal_webhook=${encodeURIComponent(this.webhookUrl)}`,
+        `https://queue.fal.run/fal-ai/reve/edit?fal_webhook=${encodeURIComponent(this.webhookUrl)}`,
         {
           method: 'POST',
           headers: {
@@ -49,7 +50,7 @@ export interface FalWebhookPayload {
           },
           body: JSON.stringify({
             prompt,
-            image_urls: imageUrls,
+            image_url: imageUrls[0], // Reve uses image_url (singular) instead of image_urls
             num_images: 1,
             output_format: 'png'
           })

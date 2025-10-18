@@ -13,7 +13,7 @@ Reve Studio is a social image generation platform where:
 
 ## ✨ Features
 
-- **Prompt-based Image Generation**: Comment with a text prompt to generate new image variations using Fal AI
+- **Prompt-based Image Generation**: Comment with a text prompt to generate new image variations using Fal AI's Reve model
 - **Threading System**: Create branches and sub-branches of image evolutions
 - **Real-time Updates**: Watch as images generate in real-time with status indicators
 - **Social Features**: Like posts and comments, see what's trending
@@ -24,7 +24,7 @@ Reve Studio is a social image generation platform where:
 
 - **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS
 - **Backend**: Supabase (Auth, Database, Storage)
-- **AI**: Fal AI for image generation
+- **AI**: Fal AI Reve model for image-to-image generation
 - **Deployment**: Vercel
 
 ## 🚀 Getting Started
@@ -109,7 +109,7 @@ MIT License - feel free to use this project for your own creative experiments!
 
 ## 🙏 Acknowledgments
 
-- Powered by Fal AI for image generation
+- Powered by [Fal AI Reve](https://fal.ai/models/fal-ai/reve/edit) for image-to-image generation
 - Built with creativity and collaboration in mind
 
 ---
