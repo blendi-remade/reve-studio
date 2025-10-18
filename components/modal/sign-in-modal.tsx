@@ -55,7 +55,7 @@ export function SignInModal({ redirectUrl: propRedirectUrl }: SignInModalProps =
             </div>
           </div>
           <CardTitle className="text-2xl font-bold font-mono">
-            🍌 Banana Peel
+            ✨ Reve Studio
           </CardTitle>
           <p className="text-sm text-gray-600 mt-2 rotate-[-0.5deg]">
             AI image remixing, Reddit-style
@@ -100,7 +100,7 @@ export function SignInModal({ redirectUrl: propRedirectUrl }: SignInModalProps =
               </div>
               <div className="relative flex justify-center text-xs">
                 <span className="bg-white px-2 text-gray-500 font-mono rotate-[2deg]">
-                  hackathon mode
+                  AI powered
                 </span>
               </div>
             </div>
@@ -119,7 +119,7 @@ export function SignInModal({ redirectUrl: propRedirectUrl }: SignInModalProps =
         <CardFooter className="border-t-2 border-black border-dashed">
           <div className="w-full space-y-2">
             <p className="text-xs text-center text-gray-600 font-mono rotate-[-0.5deg]">
-              Built with 🍌 at the hackathon
+              Built with ✨ and creativity
             </p>
             <div className="flex justify-center gap-2">
               <div className="w-2 h-2 bg-black rotate-45"></div>

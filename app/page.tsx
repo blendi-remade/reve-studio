@@ -30,7 +30,7 @@ export default function HomePage() {
             <div className="p-8 rotate-[2deg] hover:rotate-0 transition-transform inline-block border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white">
               <Image 
                 src="/logo.png"
-                alt="Banana Peel Logo"
+                alt="Reve Studio Logo"
                 width={200}
                 height={200}
                 className="object-contain"
@@ -76,7 +76,7 @@ export default function HomePage() {
           {/* Footer decorations */}
           <div className="pt-12 space-y-4">
             <p className="text-sm text-gray-500 font-mono rotate-[1deg]">
-              Built with 🍌 at the hackathon
+              Built with ✨ and creativity
             </p>
             <div className="flex justify-center gap-3">
               <div className="w-3 h-3 bg-black rotate-45"></div>

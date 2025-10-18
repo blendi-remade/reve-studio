@@ -106,7 +106,7 @@ export function AddCommentModal({
             {/* Mock image upload area */}
             <div className="border-2 border-dashed border-black p-4 text-center bg-gray-50">
               <p className="text-sm text-gray-600 font-mono">
-                🍌 Nano Banana will generate the image based on your prompt
+                ✨ AI will generate the image based on your prompt
               </p>
             </div>
 

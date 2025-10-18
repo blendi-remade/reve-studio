@@ -28,7 +28,7 @@ export interface FalWebhookPayload {
     }
   
     /**
-     * Submit an image edit request to fal.ai nano-banana model
+     * Submit an image edit request to fal.ai model
      */
     async submitImageEdit({
       prompt,

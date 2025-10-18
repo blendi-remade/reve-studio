@@ -136,7 +136,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
       <div className="absolute inset-0 bg-white/80" onClick={onClose}></div>
       
       {/* Scrollable container */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto banana-scroll">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto reve-scroll">
         <Card className="relative border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] rotate-[-1deg] hover:rotate-0 transition-transform bg-white m-4">
           {/* Fun corner decorations */}
           <div className="absolute -top-3 -right-3 w-12 h-12 bg-yellow-200 rotate-12 border-2 border-black"></div>

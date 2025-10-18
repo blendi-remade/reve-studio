@@ -1,12 +1,10 @@
-# 🍌 Banana Peel
+# ✨ Reve Studio
 
-Check it out here: https://banana-peel.com
+A collaborative image evolution platform where creativity flows through AI-powered transformations. Drop a prompt, watch images evolve through intelligent generation, creating endless branches of visual creativity.
 
-A collaborative image evolution platform where creativity slips into something unexpected. Drop a prompt, watch images transform through AI-powered generation, creating endless branches of visual creativity.
+## 🎨 What is Reve Studio?
 
-## 🎨 What is Banana Peel?
-
-Banana Peel is a social image generation platform where:
+Reve Studio is a social image generation platform where:
 - Users post original images that serve as creative starting points
 - Community members can comment with text prompts to generate new variations
 - Each prompt creates a new "branch" in the image evolution tree
@@ -49,7 +47,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Fal AI
-FAL_KEY=your_fal_api_key
+FAL_API_KEY=your_fal_api_key
 
 # App URL (for production)
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
@@ -59,7 +57,7 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com
 
 ```bash
 # Clone the repository
-git clone https://github.com/blendi-remade/banana-peel.git
+git clone https://github.com/your-username/reve-studio.git
 
 # Install dependencies
 npm install
@@ -99,7 +97,7 @@ Run the migrations in order:
 
 ## 🤝 Contributing
 
-This project was built for a hackathon with the spirit of experimentation and fun. Feel free to:
+Feel free to contribute to Reve Studio:
 - Report bugs
 - Suggest features
 - Submit pull requests
@@ -111,10 +109,9 @@ MIT License - feel free to use this project for your own creative experiments!
 
 ## 🙏 Acknowledgments
 
-- Built with 🍌 at the hackathon
 - Powered by Fal AI for image generation
-- Inspired by the chaos of creative collaboration
+- Built with creativity and collaboration in mind
 
 ---
 
-*Remember: The best ideas often come from slipping on a banana peel of creativity!*
+*Where every prompt reveals a new perspective.*

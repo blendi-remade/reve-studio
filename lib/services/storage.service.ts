@@ -25,7 +25,7 @@ export class StorageService {
   async generateUploadUrl(
     fileName: string,
     contentType: string,
-    directory: string = 'banana-peel'
+    directory: string = 'reve-studio'
   ): Promise<{ uploadUrl: string; filePath: string; publicUrl: string }> {
     const fileExtension = fileName.split('.').pop()
     const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`
@@ -108,7 +108,7 @@ export class StorageService {
   }
 
   // List files in directory
-  async listFiles(prefix: string = 'banana-peel/'): Promise<GCSFile[]> {
+  async listFiles(prefix: string = 'reve-studio/'): Promise<GCSFile[]> {
     const bucket = this.storage.bucket(this.bucketName)
     const [files] = await bucket.getFiles({ prefix })
     

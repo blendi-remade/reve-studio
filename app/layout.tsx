@@ -17,19 +17,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Banana Peel - Where Images Evolve Through AI Comments",
-  description: "The social app where every comment transforms images with AI. Drop a prompt, watch nano banana work its magic, and see your ideas come to life through collaborative visual storytelling.",
-  keywords: ["AI image generation", "social media", "image editing", "nano banana", "collaborative art", "prompt-based AI"],
+  title: "Reve Studio - Where Images Evolve Through AI Comments",
+  description: "The social app where every comment transforms images with AI. Drop a prompt, watch AI work its magic, and see your ideas come to life through collaborative visual storytelling.",
+  keywords: ["AI image generation", "social media", "image editing", "reve studio", "collaborative art", "prompt-based AI"],
   openGraph: {
-    title: "Banana Peel - Where Images Evolve Through AI Comments",
+    title: "Reve Studio - Where Images Evolve Through AI Comments",
     description: "The social app where every comment transforms images with AI. Join the visual conversation!",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Banana Peel - Where Images Evolve Through AI Comments", 
-    description: "Drop a prompt, watch AI transform images, join the visual conversation. Like Reddit, but every comment is magic! 🍌✨",
+    title: "Reve Studio - Where Images Evolve Through AI Comments", 
+    description: "Drop a prompt, watch AI transform images, join the visual conversation. Like Reddit, but every comment is magic! ✨",
   },
 };
 
@@ -49,14 +49,14 @@ export default function RootLayout({
             <header className="border-b-2 border-black border-dashed">
               <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="border-2 border-black bg-yellow-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="border-2 border-black bg-purple-200 px-4 py-2 rotate-[1deg] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <h1 className="text-xl font-bold flex items-center gap-2">
                       <Zap className="w-5 h-5" />
-                      Banana Peel
+                      Reve Studio
                     </h1>
                   </div>
                   <Badge variant="outline" className="rotate-[-1deg] border-2 border-black font-mono">
-                    🍌 hackathon
+                    ✨ AI powered
                   </Badge>
                 </div>
                 

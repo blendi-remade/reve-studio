@@ -121,42 +121,42 @@
   }
 }
 
-/* 🍌 Banana Peel Custom Scrollbar - Quirky & Sketch Style */
+/* ✨ Reve Studio Custom Scrollbar - Quirky & Sketch Style */
 @layer utilities {
-  .banana-scroll {
+  .reve-scroll {
     /* Webkit browsers (Chrome, Safari, Edge) */
     scrollbar-width: thin;
     scrollbar-color: #000000 #fef3c7;
   }
 
-  .banana-scroll::-webkit-scrollbar {
+  .reve-scroll::-webkit-scrollbar {
     width: 16px;
     height: 16px;
   }
 
-  .banana-scroll::-webkit-scrollbar-track {
+  .reve-scroll::-webkit-scrollbar-track {
     background: #fef3c7; /* yellow-100 */
     border: 2px solid #000000;
     border-radius: 0;
     margin: 4px;
   }
 
-  .banana-scroll::-webkit-scrollbar-thumb {
+  .reve-scroll::-webkit-scrollbar-thumb {
     background: #000000;
     border: none;
     border-radius: 0;
     min-height: 30px;
   }
 
-  .banana-scroll::-webkit-scrollbar-thumb:hover {
+  .reve-scroll::-webkit-scrollbar-thumb:hover {
     background: #374151; /* gray-700 */
   }
 
-  .banana-scroll::-webkit-scrollbar-thumb:active {
+  .reve-scroll::-webkit-scrollbar-thumb:active {
     background: #1f2937; /* gray-800 */
   }
 
-  .banana-scroll::-webkit-scrollbar-corner {
+  .reve-scroll::-webkit-scrollbar-corner {
     background: #fef3c7;
     border: 2px solid #000000;
   }
@@ -164,35 +164,35 @@
 
 /* Alternative scrollbar for smaller areas */
 @layer utilities {
-  .banana-scroll-thin {
+  .reve-scroll-thin {
     scrollbar-width: thin;
     scrollbar-color: #000000 #f3f4f6;
   }
 
-  .banana-scroll-thin::-webkit-scrollbar {
+  .reve-scroll-thin::-webkit-scrollbar {
     width: 12px;
     height: 12px;
   }
 
-  .banana-scroll-thin::-webkit-scrollbar-track {
+  .reve-scroll-thin::-webkit-scrollbar-track {
     background: #f3f4f6; /* gray-100 */
     border: 1px solid #000000;
     border-radius: 0;
     margin: 2px;
   }
 
-  .banana-scroll-thin::-webkit-scrollbar-thumb {
+  .reve-scroll-thin::-webkit-scrollbar-thumb {
     background: #000000;
     border: none;
     border-radius: 0;
     min-height: 20px;
   }
 
-  .banana-scroll-thin::-webkit-scrollbar-thumb:hover {
+  .reve-scroll-thin::-webkit-scrollbar-thumb:hover {
     background: #374151;
   }
 
-  .banana-scroll-thin::-webkit-scrollbar-corner {
+  .reve-scroll-thin::-webkit-scrollbar-corner {
     background: #f3f4f6;
     border: 1px solid #000000;
   }
@@ -200,35 +200,35 @@
 
 /* Dashed scrollbar variant */
 @layer utilities {
-  .banana-scroll-dashed {
+  .reve-scroll-dashed {
     scrollbar-width: thin;
     scrollbar-color: #000000 #ffffff;
   }
 
-  .banana-scroll-dashed::-webkit-scrollbar {
+  .reve-scroll-dashed::-webkit-scrollbar {
     width: 14px;
     height: 14px;
   }
 
-  .banana-scroll-dashed::-webkit-scrollbar-track {
+  .reve-scroll-dashed::-webkit-scrollbar-track {
     background: #ffffff;
     border: 2px dashed #000000;
     border-radius: 0;
     margin: 3px;
   }
 
-  .banana-scroll-dashed::-webkit-scrollbar-thumb {
+  .reve-scroll-dashed::-webkit-scrollbar-thumb {
     background: #000000;
     border: 1px dashed #ffffff;
     border-radius: 0;
     min-height: 25px;
   }
 
-  .banana-scroll-dashed::-webkit-scrollbar-thumb:hover {
+  .reve-scroll-dashed::-webkit-scrollbar-thumb:hover {
     background: #374151;
   }
 
-  .banana-scroll-dashed::-webkit-scrollbar-corner {
+  .reve-scroll-dashed::-webkit-scrollbar-corner {
     background: #ffffff;
     border: 2px dashed #000000;
   }

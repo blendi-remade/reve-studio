@@ -418,7 +418,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               {post.likes_count || 0}
             </Badge>
             <Badge variant="outline" className="rotate-[2deg] border-2 border-black font-mono">
-              🍌 nano banana
+              ✨ AI Studio
             </Badge>
           </div>
         </div>
@@ -481,7 +481,7 @@ export default function PostPage({ params: paramsPromise }: PostPageProps) {
               </CardHeader>
               <CardContent 
                 ref={commentsContainerRef} // Add ref back
-                className="p-4 flex-1 overflow-y-auto banana-scroll min-h-0"
+                className="p-4 flex-1 overflow-y-auto reve-scroll min-h-0"
               >
                 {/* Loading State */}
                 {loading && (
