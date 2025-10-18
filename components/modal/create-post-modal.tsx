@@ -157,7 +157,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold font-mono">
-              🍌 Create New Post
+              🎨 Create New Post
             </CardTitle>
             <p className="text-sm text-gray-600 mt-2 rotate-[-0.5deg]">
               Upload an image to start the remix chain!
@@ -281,7 +281,7 @@ export function CreatePostModal({ onClose }: CreatePostModalProps) {
               </div>
               
               <div className="border-2 border-black p-4 bg-gray-50 rotate-[0.5deg]">
-                <h3 className="font-mono font-bold mb-2">🍌 What happens next?</h3>
+                <h3 className="font-mono font-bold mb-2">⚡ What happens next?</h3>
                 <p className="text-sm">
                   Your image becomes the root of a remix tree! Other users can add prompts 
                   to edit your image, creating a branching chain of AI-generated variations.
