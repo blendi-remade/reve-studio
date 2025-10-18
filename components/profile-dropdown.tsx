@@ -37,21 +37,8 @@ export function ProfileDropdown() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 border-2 border-black bg-white px-3 py-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[4px] active:translate-y-[4px] transition-all duration-200 rotate-[-1deg] hover:rotate-0"
       >
-        {/* Avatar */}
-        {profile.avatar_url ? (
-          <img
-            src={profile.avatar_url}
-            alt={profile.display_name || 'User'}
-            className="w-8 h-8 rounded-full border-2 border-black"
-          />
-        ) : (
-          <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-bold">
-            {initials}
-          </div>
-        )}
-        
         {/* Name */}
-        <span className="font-mono text-sm hidden sm:block">
+        <span className="font-mono text-sm">
           {profile.display_name || profile.email || 'User'}
         </span>
         
@@ -109,7 +96,7 @@ export function ProfileDropdown() {
               <div className="pt-3 border-t-2 border-black border-dashed">
                 <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
                   <Zap className="w-3 h-3" />
-                  <span className="font-mono rotate-[2deg]">Powered by 🍌</span>
+                  <span className="font-mono rotate-[2deg]">Powered by ✨</span>
                 </div>
               </div>
             </CardContent>
