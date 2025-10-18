@@ -59,7 +59,7 @@ export interface FalWebhookPayload {
   
       if (!response.ok) {
         const error = await response.text()
-        throw new Error(`Fal API error: ${error}`)
+        throw new Error(`fal.ai API error: ${error}`)
       }
   
       const data = await response.json()
