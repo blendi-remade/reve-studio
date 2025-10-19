@@ -9,7 +9,6 @@ Reve Studio is a social image generation platform where:
 - Community members can comment with text prompts to generate new variations
 - Each prompt creates a new "branch" in the image evolution tree
 - Comments can be nested, creating entire chains of image transformations
-- The playful, sketch-style UI makes exploring image variations fun and engaging
 
 ## ✨ Features
 
